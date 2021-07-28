@@ -7,7 +7,9 @@
   },
   "description": "parse sql to mongo query",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "sqlite-parser": "^1.0.1"
+  },
   "devDependencies": {
     "@types/node": "^16.4.3",
     "prettier": "^2.3.2",
