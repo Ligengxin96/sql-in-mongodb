@@ -15,13 +15,6 @@ let sql = `select c1, c2 from table1 where id = 1 and name = 'abc' and age = 12 
 
 let queryConditon:any = { '$and': [], '$or': [] };
 
-const recursionWhereCondition = (left: WhereCondition, right: WhereCondition) => {
-  if (left.left == null) { 
-    return;
-  }
-  console.log(left, right);
-  recursionWhereCondition(left.left, right.right);
-}
 const parseWhereCondition = (whereConditon: WhereCondition, currentCondition: string = '') => {
   if (!whereConditon.left) {
     return;
