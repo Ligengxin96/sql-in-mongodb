@@ -7,7 +7,7 @@ export type WhereCondition = {
   operation: string,
   right: WhereCondition,
   type: String,
-  variant: string,
+  variant: Variant,
   name?: String,
   value?: string,
 }
@@ -27,5 +27,10 @@ export type SelectStatement = {
 export type Select = {
   statement: Array<SelectStatement>,
   type: String,
-  variant: String,
+  variant: Variant,
+}
+
+export type QueryConditon = {
+  $and?: Array<{ [key: string]: any }>,
+  $or?: Array<{ [key: string]: any }>
 }

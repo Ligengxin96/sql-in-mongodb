@@ -1,8 +1,10 @@
-import { Select, WhereCondition } from './types';
+import { Select, WhereCondition, QueryConditon } from './types';
+import { FilterQuery } from 'mongoose';
+import { test } from './test';
 
 const parser = require('sqlite-parser');
 
-let sql = `select c1, c2 from table1 where id = 1 and name = 'abc' and age = 12 or sex = '男'`;
+let sql = `select c1, c2 from table1 where title = 'Land of the midnight sun'`;
 
 /*
                  and
@@ -13,9 +15,9 @@ let sql = `select c1, c2 from table1 where id = 1 and name = 'abc' and age = 12 
 {"$and":[{"id": 1},{"name": abc}, {"age": 12}]}
 */
 
-let queryConditon:any = { '$and': [], '$or': [] };
+let queryConditon: FilterQuery<QueryConditon> = { '$and': [], '$or': [] };
 
-const parseWhereCondition = (whereConditon: WhereCondition, currentCondition: string = '') => {
+const parseWhereCondition = (whereConditon: WhereCondition, currentCondition = '') => {
   if (!whereConditon.left) {
     return;
   }
@@ -29,9 +31,9 @@ const parseWhereCondition = (whereConditon: WhereCondition, currentCondition: st
   if (whereConditon?.operation === '=') {
     console.log(whereConditon.left.name, '=', whereConditon.right.value);
     if (currentCondition !== 'or') {
-      queryConditon[`$and`].push({[`${whereConditon.left.name}`]: whereConditon.right.value});
+      queryConditon[`$and`]?.push({[`${whereConditon.left.name}`]: whereConditon.right.value});
     } else {
-      queryConditon[`$or`].push({[`${whereConditon.left.name}`]: whereConditon.right.value});
+      queryConditon[`$or`]?.push({[`${whereConditon.left.name}`]: whereConditon.right.value});
     }
     currentCondition = '';
   }
@@ -46,4 +48,14 @@ const select = (ast: Select) => {
 
 select(parser(sql));
 
+if (!queryConditon?.$and?.length) {
+  delete queryConditon.$and;
+}
+
+if (!queryConditon?.$or?.length) {
+  delete queryConditon.$or;
+}
+
 console.log(queryConditon);
+
+test(queryConditon);
