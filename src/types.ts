@@ -24,7 +24,7 @@ export type SelectStatement = {
   where: Array<WhereCondition>,
 }
 
-export type Select = {
+export type SQLAST = {
   statement: Array<SelectStatement>,
   type: String,
   variant: Variant,

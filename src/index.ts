@@ -1,21 +1,11 @@
-import { Select, WhereCondition, QueryConditon } from './types';
+import { SQLAST, WhereCondition, QueryConditon } from './types';
 import { FilterQuery } from 'mongoose';
-import { test } from './test';
 
 const parser = require('sqlite-parser');
 
-let sql = `select c1, c2 from table1 where title = 'Land of the midnight sun'`;
+const SQLPREFIX = 'SELECT * FROM SOMETABLE';
 
-/*
-                 and
-         and              =
-      =       =       age   12
-    id 1  name  'abc'  
-
-{"$and":[{"id": 1},{"name": abc}, {"age": 12}]}
-*/
-
-let queryConditon: FilterQuery<QueryConditon> = { '$and': [], '$or': [] };
+const queryConditon: FilterQuery<QueryConditon> = { '$and': [], '$or': [] };
 
 const parseWhereCondition = (whereConditon: WhereCondition, currentCondition = '') => {
   if (!whereConditon.left) {
@@ -41,21 +31,32 @@ const parseWhereCondition = (whereConditon: WhereCondition, currentCondition = '
   parseWhereCondition(whereConditon.right, currentCondition);
 }
 
-const select = (ast: Select) => {
-  const {  where } = ast.statement[0];
+const processSqlAst = (ast: SQLAST) => {
+  const { where } = ast.statement[0];
   parseWhereCondition(where[0]);
 }
 
-select(parser(sql));
-
-if (!queryConditon?.$and?.length) {
-  delete queryConditon.$and;
+export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<QueryConditon> => {
+  if (sqlWhereConditon.match(/^(where)(\s).*/i)) {
+    try {
+      const ast: SQLAST = parser(`${SQLPREFIX} ${sqlWhereConditon}`);
+  
+      processSqlAst(ast);
+      
+      if (!queryConditon?.$and?.length) {
+        delete queryConditon.$and;
+      }
+      if (!queryConditon?.$or?.length) {
+        delete queryConditon.$or;
+      }
+      
+      console.log(queryConditon);
+      
+      return queryConditon;
+    } catch (error) {
+      throw new Error('Invalid SQL where condition, Please check your SQL where condition statement.');
+    }
+  } else {
+    throw new Error('Invalid SQL where condition, Please check your SQL where condition statement.');
+  }
 }
-
-if (!queryConditon?.$or?.length) {
-  delete queryConditon.$or;
-}
-
-console.log(queryConditon);
-
-test(queryConditon);
