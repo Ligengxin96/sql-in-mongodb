@@ -20,14 +20,20 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'prettier', 'import'],
   rules: {
-    'prettier/prettier': 'error',
     'import/extensions': 'off',
     'import/no-unresolved': 'error',
+    'import/prefer-default-export': 'off',
     'no-console': 'off',
+    'no-param-reassign': 'off',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
     'import/order': [
       'error',
       {
-        'newlines-between': 'never',
         groups: [
           ['builtin', 'external'],
           ['internal', 'parent', 'sibling', 'index'],
