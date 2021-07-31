@@ -29,6 +29,7 @@ module.exports = {
       'error',
       {
         endOfLine: 'auto',
+        printWidth: 150,
       },
     ],
     'import/order': [
