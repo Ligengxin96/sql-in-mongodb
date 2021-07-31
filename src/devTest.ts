@@ -1,9 +1,9 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import mongoose, { FilterQuery } from 'mongoose';
 import dotenv from 'dotenv';
-import { parserSQLWhereConditon } from '../index';
-import { QueryConditon } from '../types';
-import PostModel from '../models/post';
+import { parserSQLWhereConditon } from './index';
+import { QueryConditon } from './types';
+import PostModel from './models/post';
 
 dotenv.config();
 
