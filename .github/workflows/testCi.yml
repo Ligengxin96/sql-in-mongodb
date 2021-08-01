@@ -27,3 +27,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: yarn
     - run: yarn test
+      envs:
+          CONNECT_STRING: ${{ secrets.CONNECT_STRING }}
