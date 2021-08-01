@@ -24,12 +24,13 @@ module.exports = {
     'import/no-unresolved': 'error',
     'import/prefer-default-export': 'off',
     'no-console': 'off',
-    'no-param-reassign': 'off',
+    'no-param-reassign': 'always',
     'prettier/prettier': [
       'error',
       {
         endOfLine: 'auto',
         printWidth: 150,
+        'prefer-arrow-callback': false,
       },
     ],
     'import/order': [
