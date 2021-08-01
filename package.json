@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "test": "npm run build && jest ./src/__tests__/serverTest/*.test.ts --collectCoverage",
-    "test-dev": "npm run build && jest ./src/__tests__/devTest/*.test.ts",
+    "test-dev": "npm run build && jest ./src/__tests__/devTest/*.test.ts --collectCoverage",
     "tslint": "tslint --project tsconfig.json ./*.ts ./lib/**/*.ts ./test/**/*.ts ./types/**/*.ts",
     "tslint-fix": "tslint --fix --project tsconfig.json ./*.ts ./lib/**/*.ts ./test/**/*.ts ./types/**/*.ts",
     "tslint-check": "tslint-config-prettier-check ./tslint.json",

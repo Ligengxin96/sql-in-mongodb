@@ -14,6 +14,10 @@ describe('Dev Test', () => {
     });
   });
 
+  afterAll(() => {
+    mongoose.disconnect();
+  });
+
   it('Test simple select statement', async () => {
     const sqlWhereConditon = `WHERE title = 'Land of the midnight sun'`;
     const queryConditon = parserSQLWhereConditon(sqlWhereConditon);
@@ -33,5 +37,14 @@ describe('Dev Test', () => {
     const queryConditon = parserSQLWhereConditon(sqlWhereConditon);
     const posts = await PostModel.find(queryConditon);
     expect(posts.length).toEqual(2);
+  });
+
+  it('Test simple select statement with and & or', async () => {
+    const sqlWhereConditon = `
+      WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees' 
+      and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
+    const queryConditon = parserSQLWhereConditon(sqlWhereConditon);
+    const posts = await PostModel.find(queryConditon);
+    expect(posts[0].title).toEqual('Land of the midnight sun');
   });
 });

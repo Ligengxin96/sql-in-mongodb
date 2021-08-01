@@ -28,4 +28,15 @@ describe('Test base case', () => {
     const queryConditon = parserSQLWhereConditon(sqlWhereConditon);
     expect(queryConditon).toStrictEqual({ $or: [{ title: 'Land of the midnight sun' }, { title: 'Mangrove trees' }] });
   });
+
+  it('Test simple select statement with and & or', async () => {
+    const sqlWhereConditon = `
+      WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees' 
+      and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
+    const queryConditon = parserSQLWhereConditon(sqlWhereConditon);
+    expect(queryConditon).toStrictEqual(
+      {$and:[{"message":"copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)"}],
+      $or:[{title:"Land of the midnight sun"},{title:"Mangrove trees"}]
+    });
+  });
 });

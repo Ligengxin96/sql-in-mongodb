@@ -99,7 +99,7 @@ export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<Qu
       if (!queryConditon?.$or?.length) {
         delete queryConditon.$or;
       }
-      // console.log('queryConditon', JSON.stringify(queryConditon));
+      console.log('queryConditon', JSON.stringify(queryConditon));
       return queryConditon;
     } catch (error) {
       console.log(error.message);
@@ -110,5 +110,5 @@ export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<Qu
   }
 };
 
-// const sqlWhereConditon = `WHERE title = 'Land of the midnight sun'`;
-// parserSQLWhereConditon(sqlWhereConditon);
+const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees' and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
+parserSQLWhereConditon(sqlWhereConditon);
