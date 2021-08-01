@@ -11,6 +11,18 @@
       "program": "${workspaceFolder}/${relativeFile}",
       "preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+    }, {
+      "type": "node",
+      "name": "Debug Jest Test",
+      "request": "launch",
+      "args": [
+        "--runInBand"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
     }
   ]
 }

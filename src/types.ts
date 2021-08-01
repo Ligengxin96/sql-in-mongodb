@@ -6,7 +6,7 @@ export type WhereCondition = {
   left: WhereCondition;
   operation: string;
   right: WhereCondition;
-  type: string;
+  type: WhereTypeAttribute;
   variant: Variant;
   name?: string;
   value?: string;
