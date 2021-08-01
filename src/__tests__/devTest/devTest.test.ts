@@ -47,4 +47,13 @@ describe('Dev Test', () => {
     const posts = await PostModel.find(queryConditon);
     expect(posts[0].title).toEqual('Land of the midnight sun');
   });
+
+  it('Test simple select statement with duplicate and & or conditon', async () => {
+    const sqlWhereConditon = `
+      WHERE title = 'Land of the midnight sun' and title = 'Land of the midnight sun'
+      or title = 'Mangrove trees' or title = 'Mangrove trees'`;
+    const queryConditon = parserSQLWhereConditon(sqlWhereConditon);
+    const posts = await PostModel.find(queryConditon);
+    expect(posts.length).toEqual(2);
+  });
 });

@@ -8,7 +8,7 @@ const parser = require('sqlite-parser');
 
 const SQLPREFIX = 'SELECT * FROM SOMETABLE';
 
-const CONDITION_OPERATOR = ['and', 'or'];
+const CONDITION_OPERATORS = ['and', 'or'];
 
 // const OPERATOR = ['and', 'or', 'like', 'not like', 'in', 'not in', 'between', 'not between', 'is', 'is not', '>', '<', '>=', '<=', '!='];
 
@@ -24,7 +24,7 @@ const parseWhereCondition = (whereConditon: WhereCondition, conditionStack: stri
   }
 
   if (operator != null) {
-    if (CONDITION_OPERATOR.indexOf(operator) < 0) {
+    if (CONDITION_OPERATORS.indexOf(operator) === -1) {
       conditionStack.push(`${whereConditon.left.name} ${operator} ${whereConditon.right.value}`);
     } else {
       conditionStack.push(operator);
@@ -36,11 +36,30 @@ const parseWhereCondition = (whereConditon: WhereCondition, conditionStack: stri
   }
 };
 
+const filterDuplicateCondition = (conditionStack: string[]) => {
+  const map = new Map();
+  const duplicateCondition: string[] = [];
+
+  const filteredConditions = conditionStack.filter(item => CONDITION_OPERATORS.indexOf(item) === -1);
+  for (let i = 0; i < filteredConditions.length; i++) {
+      if (map.has(filteredConditions[i])) {
+        duplicateCondition.push(filteredConditions[i]);
+      }
+      map.set(filteredConditions[i], 1);
+  }
+
+  duplicateCondition.forEach((item) => {
+    conditionStack.splice(conditionStack.indexOf(item), 2);
+  })
+
+  return conditionStack;
+}
+
 const processSqlAst = (ast: SQLAST) => {
   const { where } = ast.statement[0];
   const conditionStack: string[] = [];
   parseWhereCondition(where[0], conditionStack);
-  return conditionStack;
+  return filterDuplicateCondition(conditionStack);
 };
 
 export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<QueryConditon> => {
@@ -58,7 +77,7 @@ export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<Qu
       let queryConditon: FilterQuery<QueryConditon> = { $and: [], $or: [] };
 
       for (let i = 0, isFirstTime = true; i < conditionStack.length; ) {
-        const operatorIndex = conditionStack.findIndex((conditon, index) => index > i && CONDITION_OPERATOR.indexOf(conditon) > -1);
+        const operatorIndex = conditionStack.findIndex((conditon, index) => index > i && CONDITION_OPERATORS.indexOf(conditon) > -1);
         let isConditionOperatorExist = operatorIndex > -1;
 
         if (isFirstTime && !isConditionOperatorExist) {
@@ -79,14 +98,18 @@ export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<Qu
               let [cloumn, value] = conditionStack[operatorIndex - 1].split('=');
               cloumn = cloumn.trim();
               value = value.trim();
-              queryConditon[`$${mongOperator}`]?.push({ [`${cloumn}`]: value });
+              if (queryConditon[`$${mongOperator}`].indexOf(value) === -1) {
+                queryConditon[`$${mongOperator}`]?.push({ [`${cloumn}`]: value });
+              }
               isFirstTime = false;
             }
 
             let [cloumn, value] = conditionStack[operatorIndex + 1].split('=');
             cloumn = cloumn.trim();
             value = value.trim();
-            queryConditon[`$${mongOperator}`]?.push({ [`${cloumn}`]: value });
+            if (queryConditon[`$${mongOperator}`].indexOf(value) === -1) {
+              queryConditon[`$${mongOperator}`]?.push({ [`${cloumn}`]: value });
+            }
           }
         } else {
           break;
@@ -99,7 +122,7 @@ export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<Qu
       if (!queryConditon?.$or?.length) {
         delete queryConditon.$or;
       }
-      console.log('queryConditon', JSON.stringify(queryConditon));
+      console.log('queryConditon', `db.postmessages.find(${JSON.stringify(queryConditon)})`);
       return queryConditon;
     } catch (error) {
       console.log(error.message);
@@ -110,5 +133,5 @@ export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<Qu
   }
 };
 
-const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees' and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
+const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' and title = 'Land of the midnight sun' or title = 'Mangrove trees' or title = 'Mangrove trees'`;
 parserSQLWhereConditon(sqlWhereConditon);

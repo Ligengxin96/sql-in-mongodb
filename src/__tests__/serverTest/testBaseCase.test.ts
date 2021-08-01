@@ -39,4 +39,12 @@ describe('Test base case', () => {
       $or:[{title:"Land of the midnight sun"},{title:"Mangrove trees"}]
     });
   });
+
+  it('Test simple select statement with duplicate and & or conditon', async () => {
+    const sqlWhereConditon = `
+      WHERE title = 'Land of the midnight sun' and title = 'Land of the midnight sun'
+      or title = 'Mangrove trees' or title = 'Mangrove trees'`;
+    const queryConditon = parserSQLWhereConditon(sqlWhereConditon);
+    expect(queryConditon).toStrictEqual({ $or: [{ title: 'Land of the midnight sun' }, { title: 'Mangrove trees' }] });
+  });
 });
