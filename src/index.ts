@@ -44,7 +44,7 @@ const processSqlAst = (ast: SQLAST) => {
 };
 
 export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<QueryConditon> => {
-  sqlWhereConditon = sqlWhereConditon.trimStart().trimEnd();
+  sqlWhereConditon = sqlWhereConditon.trim();
   if (sqlWhereConditon.match(/^where\s.*/i)) {
     try {
       const ast: SQLAST = parser(`${SQLPREFIX} ${sqlWhereConditon}`);
