@@ -62,7 +62,7 @@ const processSqlAst = (ast: SQLAST) => {
   return filterDuplicateCondition(conditionStack);
 };
 
-export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<QueryConditon> => {
+export const parseSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<QueryConditon> => {
   sqlWhereConditon = sqlWhereConditon.trim();
   if (sqlWhereConditon.match(/^where\s.*/i)) {
     try {
@@ -134,4 +134,4 @@ export const parserSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<Qu
 };
 
 const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' and title = 'Land of the midnight sun' or title = 'Mangrove trees' or title = 'Mangrove trees'`;
-parserSQLWhereConditon(sqlWhereConditon);
+parseSQLWhereConditon(sqlWhereConditon);
