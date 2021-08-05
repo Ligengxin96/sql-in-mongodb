@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { parseSQLWhereConditon } from '../../index';
 
-describe('Test base case', () => {
+describe.skip('Test base case', () => {
   it('Test error select statement', () => {
     const sqlWhereConditon = `WHERE error = `;
     try {
