@@ -6,7 +6,7 @@ import PostModel from '../../models/post';
 
 dotenv.config();
 
-describe.skip('Dev Test', () => {
+describe('Dev Test', () => {
   beforeAll(() => {
     mongoose.connect(process.env.CONNECT_STRING as string, {
       useNewUrlParser: true,
@@ -18,42 +18,80 @@ describe.skip('Dev Test', () => {
     mongoose.disconnect();
   });
 
-  it('Test simple select statement', async () => {
+  it('Test simple where statement', async () => {
     const sqlWhereConditon = `WHERE title = 'Land of the midnight sun'`;
     const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
     const posts = await PostModel.find(queryConditon);
     expect(posts[0].title).toEqual('Land of the midnight sun');
   });
 
-  it('Test simple select statement with and', async () => {
+  it('Test simple where statement with and', async () => {
     const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' and title = '123'`;
     const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
     const posts = await PostModel.find(queryConditon);
     expect(posts.length).toEqual(0);
   });
 
-  it('Test simple select statement with or', async () => {
+  it('Test simple where statement with or', async () => {
     const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees'`;
     const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
     const posts = await PostModel.find(queryConditon);
     expect(posts.length).toEqual(2);
+    expect(posts[0].title).toEqual('Land of the midnight sun');
+    expect(posts[1].title).toEqual('Mangrove trees');
   });
 
-  it('Test simple select statement with and & or', async () => {
+  it('Test simple where statement with and && or', async () => {
+    const sqlWhereConditon = `
+      WHERE title = 'Land of the midnight sun' and title = 'Mangrove trees' 
+      or message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
+    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
+    const posts = await PostModel.find(queryConditon);
+    expect(posts[0].title).toEqual('Land of the midnight sun');
+    expect(posts[0].message).toEqual('copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)');
+  });
+
+  it('Test simple where statement with or && and', async () => {
     const sqlWhereConditon = `
       WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees' 
       and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
     const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
     const posts = await PostModel.find(queryConditon);
     expect(posts[0].title).toEqual('Land of the midnight sun');
+    expect(posts[0].message).toEqual('copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)');
   });
 
-  it('Test simple select statement with duplicate and & or conditon', async () => {
+  it('Test simple where statement with duplicate and & or', async () => {
     const sqlWhereConditon = `
       WHERE title = 'Land of the midnight sun' and title = 'Land of the midnight sun'
       or title = 'Mangrove trees' or title = 'Mangrove trees'`;
     const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
     const posts = await PostModel.find(queryConditon);
     expect(posts.length).toEqual(2);
+    expect(posts[0].title).toEqual('Land of the midnight sun');
+    expect(posts[1].title).toEqual('Mangrove trees');
+  });
+
+
+  it('Test simple where statement with and && or, brackets', async () => {
+    const sqlWhereConditon = `
+      WHERE title = 'Land of the midnight sun' 
+      and (message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)' 
+      or title = 'Mangrove trees')`;
+    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
+    const posts = await PostModel.find(queryConditon);
+    expect(posts[0].title).toEqual('Land of the midnight sun');
+  });
+
+  it('Test simple where statement with and,brackets && or', async () => {
+    const sqlWhereConditon = `
+      WHERE (title = 'Land of the midnight sun' 
+      and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)') 
+      or title = 'Mangrove trees'`;
+    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
+    const posts = await PostModel.find(queryConditon);
+    expect(posts.length).toEqual(2);
+    expect(posts[0].title).toEqual('Land of the midnight sun');
+    expect(posts[1].title).toEqual('Mangrove trees');
   });
 });
