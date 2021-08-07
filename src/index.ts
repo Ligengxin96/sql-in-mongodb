@@ -10,47 +10,65 @@ const SQLPREFIX = 'SELECT * FROM SOMETABLE';
 
 const CONDITION_OPERATORS = ['and', 'or'];
 
-// const OPERATOR = ['and', 'or', 'like', 'not like', 'in', 'not in', 'between', 'not between', 'is', 'is not', '>', '<', '>=', '<=', '!='];
-
-const generateMongoQuery = (whereConditon: WhereCondition): any => {
-  let { operation, left, right } = whereConditon;
-  operation = operation?.toLowerCase();
-
-  if (operation === '=' && left.name) {
-    return { [left.name]: right.value };
-  }
-
-  if (right && left) {
-    if (CONDITION_OPERATORS.indexOf(operation) > -1) {
-      return { [`$${operation}`]: [ generateMongoQuery(left), generateMongoQuery(right) ]}
+class SQLParser {
+  private generateMongoQuery = (whereConditon: WhereCondition): FilterQuery<QueryConditon> => {
+    let { operation, left, right } = whereConditon;
+  
+    if (left.name) {
+      switch (operation?.toLowerCase()) {
+        case '=': 
+          return { [left.name]: right.value };
+        case '!=':
+        case '<>':
+          return { [left.name]: { $ne: right.value } };
+        case '>':
+          return { [left.name]: { $gt: right.value } };
+        case '<':
+          return { [left.name]: { $lt: right.value } };
+        case '>=': 
+          return { [left.name]: { $gte: right.value } };
+        case '<=':
+          return { [left.name]: { $lte: right.value } };
+        case 'like':
+          if (right.value && right.value.indexOf('./') > -1 ){
+            return { [left.name]: { $regex: right.value.replace('/%', '%'), $options: 'i' } };
+          }
+          return { [left.name]: { $regex: right.value?.replace('%', '.*'), $options: 'i' } };
+        case 'not like':
+        default:
+          return {}
+      }
     }
-  } 
-};
-
-const processSqlAst = (ast: SQLAST): FilterQuery<QueryConditon> => {
-  const { where } = ast.statement[0];
-  const result = generateMongoQuery(where[0]);
-  console.log(`db.postmessages.find(${JSON.stringify(result)})`);
-  return result || {};
-};
-
-export const parseSQLWhereConditon = (sqlWhereConditon: string): FilterQuery<QueryConditon> => {
-  sqlWhereConditon = sqlWhereConditon.trim();
-  if (sqlWhereConditon.match(/^where\s.*/i)) {
+  
+    if (right && left) {
+      if (CONDITION_OPERATORS.indexOf(operation) > -1) {
+        return { [`$${operation}`]: [this.generateMongoQuery(left), this.generateMongoQuery(right)] }
+      }
+    }
+  
+    return {};
+  };
+  
+  public parseSql = (sqlQuery: string): FilterQuery<QueryConditon> => {
+    sqlQuery = sqlQuery.trim();
     let sqlAst: SQLAST;
-    try {
-      sqlAst = parser(`${SQLPREFIX} ${sqlWhereConditon}`);
-    } catch (error) {
-      console.log(error.message);
-      throw new Error('Invalid SQL where condition, Please check your SQL where condition statement.');
-    }
-    return processSqlAst(sqlAst);
-  } else {
-    throw new Error('Invalid SQL where condition, Please check your SQL where condition statement.');
-  }
-};
 
-const sqlWhereConditon = `
-      WHERE title = 'Land of the midnight sun' and title = 'Mangrove trees' 
-      or message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
-parseSQLWhereConditon(sqlWhereConditon);
+    if (sqlQuery.match(/^where\s.*/i)) {
+      sqlQuery = `${SQLPREFIX} ${sqlQuery}`;
+    }
+
+    if (sqlQuery.match(/^select\s.*\sfrom\s.*\swhere\s.*/i)) {
+      try {
+        sqlAst = parser(sqlQuery);
+      } catch (error) {
+        throw error;
+      }
+      const { where } = sqlAst.statement[0];
+      return this.generateMongoQuery(where[0]);
+    } else {
+      throw new Error('Invalid SQL statement, Please check your SQL statement.');
+    }
+  };
+}
+
+export default SQLParser;

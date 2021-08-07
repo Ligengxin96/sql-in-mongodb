@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { parseSQLWhereConditon } from '../../index';
+import SQLParser from '../../index';
 import PostModel from '../../models/post';
 
 dotenv.config();
@@ -20,22 +20,22 @@ describe('Dev Test', () => {
 
   it('Test simple where statement', async () => {
     const sqlWhereConditon = `WHERE title = 'Land of the midnight sun'`;
-    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
-    const posts = await PostModel.find(queryConditon);
+    const parser = new SQLParser();
+    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
     expect(posts[0].title).toEqual('Land of the midnight sun');
   });
 
   it('Test simple where statement with and', async () => {
     const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' and title = '123'`;
-    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
-    const posts = await PostModel.find(queryConditon);
+    const parser = new SQLParser();
+    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
     expect(posts.length).toEqual(0);
   });
 
   it('Test simple where statement with or', async () => {
     const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees'`;
-    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
-    const posts = await PostModel.find(queryConditon);
+    const parser = new SQLParser();
+    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
     expect(posts.length).toEqual(2);
     expect(posts[0].title).toEqual('Land of the midnight sun');
     expect(posts[1].title).toEqual('Mangrove trees');
@@ -45,8 +45,8 @@ describe('Dev Test', () => {
     const sqlWhereConditon = `
       WHERE title = 'Land of the midnight sun' and title = 'Mangrove trees' 
       or message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
-    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
-    const posts = await PostModel.find(queryConditon);
+    const parser = new SQLParser();
+    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
     expect(posts[0].title).toEqual('Land of the midnight sun');
     expect(posts[0].message).toEqual('copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)');
   });
@@ -55,8 +55,8 @@ describe('Dev Test', () => {
     const sqlWhereConditon = `
       WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees' 
       and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
-    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
-    const posts = await PostModel.find(queryConditon);
+    const parser = new SQLParser();
+    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
     expect(posts[0].title).toEqual('Land of the midnight sun');
     expect(posts[0].message).toEqual('copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)');
   });
@@ -65,8 +65,8 @@ describe('Dev Test', () => {
     const sqlWhereConditon = `
       WHERE title = 'Land of the midnight sun' and title = 'Land of the midnight sun'
       or title = 'Mangrove trees' or title = 'Mangrove trees'`;
-    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
-    const posts = await PostModel.find(queryConditon);
+    const parser = new SQLParser();
+    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
     expect(posts.length).toEqual(2);
     expect(posts[0].title).toEqual('Land of the midnight sun');
     expect(posts[1].title).toEqual('Mangrove trees');
@@ -78,8 +78,8 @@ describe('Dev Test', () => {
       WHERE title = 'Land of the midnight sun' 
       and (message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)' 
       or title = 'Mangrove trees')`;
-    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
-    const posts = await PostModel.find(queryConditon);
+    const parser = new SQLParser();
+    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
     expect(posts[0].title).toEqual('Land of the midnight sun');
   });
 
@@ -88,8 +88,8 @@ describe('Dev Test', () => {
       WHERE (title = 'Land of the midnight sun' 
       and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)') 
       or title = 'Mangrove trees'`;
-    const queryConditon = parseSQLWhereConditon(sqlWhereConditon);
-    const posts = await PostModel.find(queryConditon);
+    const parser = new SQLParser();
+    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
     expect(posts.length).toEqual(2);
     expect(posts[0].title).toEqual('Land of the midnight sun');
     expect(posts[1].title).toEqual('Mangrove trees');
