@@ -1,11 +1,23 @@
 export type WhereTypeAttribute = 'identifier' | 'literal' | 'expression';
 export type Variant = 'column' | 'operation' | 'text' | 'decimal';
 
+export type WhereLeftSubCondition = {
+  type: WhereTypeAttribute;
+  variant: Variant;
+  name: string;
+}
+
+export type WhereRightSubCondition = {
+  type: WhereTypeAttribute;
+  variant: Variant;
+  value: string | number | boolean | Date | null;
+}
+
 export type WhereCondition = {
   format: string;
-  left: WhereCondition;
+  left: WhereCondition | WhereLeftSubCondition;
   operation: string;
-  right: WhereCondition;
+  right: WhereCondition | WhereRightSubCondition;
   type: WhereTypeAttribute;
   variant: Variant;
   name?: string;

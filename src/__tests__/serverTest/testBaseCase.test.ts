@@ -21,6 +21,29 @@ describe('Test base case', () => {
     }
   });
 
+  it('Test simple wrong sql query', () => {
+    try {
+      const sqlQuery = `select from t WHERE title = 'error'`;
+      const parser = new SQLParser();
+      parser.parseSql(sqlQuery)
+    } catch (error) {
+      expect(error.message).toStrictEqual('Invalid SQL statement, Please check your SQL statement.');
+    }
+  });
+
+  it('Test simple sql query', () => {
+    const sqlQuery = `select * from t`;
+    const parser = new SQLParser();
+    expect(parser.parseSql(sqlQuery)).toStrictEqual({});
+  });
+
+  it('Test simple sql query with where condition', () => {
+    const sqlQuery = `select * from t WHERE title = 'this is title'`;
+    const parser = new SQLParser();
+    expect(parser.parseSql(sqlQuery)).toStrictEqual({ title: 'this is title' });
+  });
+
+
   it('Test simple where statement', () => {
     const sqlWhereConditon = `WHERE title = 'Land of the midnight sun'`;
     const parser = new SQLParser();
