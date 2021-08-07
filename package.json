@@ -17,7 +17,7 @@
     "prepack": "npm install && tsc && npm run tslint"
   },
   "dependencies": {
-    "sqlite-parser": "^1.0.1"
+    "node-sql-parser": "^3.6.1"
   },
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",

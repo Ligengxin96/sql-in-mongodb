@@ -38,9 +38,18 @@ describe('Test base case', () => {
   });
 
   it('Test simple sql query with where condition', () => {
-    const sqlQuery = `select * from t WHERE title = 'this is title'`;
     const parser = new SQLParser();
-    expect(parser.parseSql(sqlQuery)).toStrictEqual({ title: 'this is title' });
+    expect(parser.parseSql(`select * from t WHERE title = 'this is title'`)).toStrictEqual({ title: 'this is title' });
+    expect(parser.parseSql(`select * from t WHERE number = 123`)).toStrictEqual({ number: 123 });
+    expect(parser.parseSql(`select * from t WHERE number = 123.456`)).toStrictEqual({ number: 123.456 });
+    expect(parser.parseSql(`select * from t WHERE number > 456.231`)).toStrictEqual({ number: { $gt: 456.231 } });
+    expect(parser.parseSql(`select * from t WHERE number < 123`)).toStrictEqual({ number: { $lt: 123 } });
+    expect(parser.parseSql(`select * from t WHERE number >= 100.123`)).toStrictEqual({ number: { $gte: 100.123 } });
+    expect(parser.parseSql(`select * from t WHERE number <= 12.123`)).toStrictEqual({ number: { $lte: 12.123 } });
+    expect(parser.parseSql(`select * from t WHERE number <> 1`)).toStrictEqual({ number: { $ne: 1 } });
+    expect(parser.parseSql(`select * from t WHERE number != 1.1`)).toStrictEqual({ number: { $ne: 1.1 } });
+    expect(parser.parseSql(`select * from t WHERE boolean = true`)).toStrictEqual({ boolean: true });
+    expect(parser.parseSql(`select * from t WHERE boolean = false`)).toStrictEqual({ boolean: false });
   });
 
 
