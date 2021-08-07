@@ -1,27 +1,33 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { FilterQuery } from 'mongoose';
+import { Parser } from 'node-sql-parser';
 
-import { SQLAST, WhereCondition, QueryConditon, WhereLeftSubCondition, WhereRightSubCondition } from './types';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const parser = require('sqlite-parser');
+import { SQLAst } from './types/SQLAst';
+import { MongoQuery } from './types/MongoQuery';
+import { Where, WhereLeftSubCondition, WhereRightSubCondition } from './types/Where';
 
 const SQLPREFIX = 'SELECT * FROM SOMETABLE';
 
 const CONDITION_OPERATORS = ['and', 'or'];
 
 class SQLParser {
+  parser: Parser;
+  constructor() {
+    this.parser = new Parser();
+  }
 
   private processRightValue(right: WhereRightSubCondition): string | number | boolean | Date | null {
-    const { value, variant } = right;
-    if (variant === 'decimal') {
+    const { value, type } = right;
+    if (type === 'number') {
       return Number(value);
+    }
+    if (type === 'bool') {
+      return Boolean(value);
     }
     return String(value);
   }
 
-  private processLikeOperator(left: WhereLeftSubCondition, right: WhereRightSubCondition): FilterQuery<QueryConditon> {
-    const { name } = left;
+  private processLikeOperator(left: WhereLeftSubCondition, right: WhereRightSubCondition): FilterQuery<MongoQuery> {
+    const { column } = left;
     let { value } = right;
     value = String(value);
     let prefix = '';
@@ -32,39 +38,40 @@ class SQLParser {
     if (value.startsWith('%')) {
       value = `${value.substr(1)}`;
       if (!value) {
-        return { [name]: { $regex: '.*', $options: 'i' } };
+        return { [column]: { $regex: '.*', $options: 'i' } };
       } 
       suffix = '$';
     }
     if (value.endsWith('%') && !value.endsWith('/%')) {
       value = `${value.substr(0, value.length - 1)}`;
       if (!value) {
-        return { [name]: { $regex: '.*', $options: 'i' } };
+        return { [column]: { $regex: '.*', $options: 'i' } };
       } 
       prefix = '^';
     }
-    return { [name]: { $regex: `${prefix}${value}${suffix}`.replace(/%/g, '.*'), $options: 'i' } };
+    return { [column]: { $regex: `${prefix}${value}${suffix}`.replace(/%/g, '.*'), $options: 'i' } };
   }
 
-  private generateMongoQuery = (whereConditon: WhereCondition): FilterQuery<QueryConditon> => {
-    let { operation, left, right } = whereConditon;
-
-    if (left.name) {
-      const { name } = left; 
-      switch (operation?.toLowerCase()) {
+  private generateMongoQuery = (whereConditon: Where): FilterQuery<MongoQuery> => {
+    let { operator } = whereConditon;
+    const { left, right } = whereConditon;
+    operator = operator?.toLowerCase();
+    const { column } = left as WhereLeftSubCondition;
+    if (column) {
+      switch (operator) {
         case '=':
-          return { [name]: this.processRightValue(right as WhereRightSubCondition) };
+          return { [column]: this.processRightValue(right as WhereRightSubCondition) };
         case '!=':
         case '<>':
-          return { [name]: { $ne: this.processRightValue(right as WhereRightSubCondition) } };
+          return { [column]: { $ne: this.processRightValue(right as WhereRightSubCondition) } };
         case '>': 
-          return { [name]: { $gt: this.processRightValue(right as WhereRightSubCondition) } };
+          return { [column]: { $gt: this.processRightValue(right as WhereRightSubCondition) } };
         case '<': 
-          return { [name]: { $lt: this.processRightValue(right as WhereRightSubCondition) } };
+          return { [column]: { $lt: this.processRightValue(right as WhereRightSubCondition) } };
         case '>=':
-          return { [name]: { $gte: this.processRightValue(right as WhereRightSubCondition) } };
+          return { [column]: { $gte: this.processRightValue(right as WhereRightSubCondition) } };
         case '<=':
-          return { [name]: { $lte: this.processRightValue(right as WhereRightSubCondition) } };
+          return { [column]: { $lte: this.processRightValue(right as WhereRightSubCondition) } };
         case 'like':
           return this.processLikeOperator(left as WhereLeftSubCondition, right as WhereRightSubCondition);
         case 'not like':
@@ -75,17 +82,17 @@ class SQLParser {
     }
 
     if (right && left) {
-      if (CONDITION_OPERATORS.indexOf(operation) > -1) {
-        return { [`$${operation}`]: [this.generateMongoQuery(left as WhereCondition), this.generateMongoQuery(right as WhereCondition)] }
+      if (CONDITION_OPERATORS.indexOf(operator) > -1) {
+        return { [`$${operator}`]: [this.generateMongoQuery(left as Where), this.generateMongoQuery(right as Where)] }
       }
     }
 
     return {};
   };
 
-  public parseSql = (sqlQuery: string): FilterQuery<QueryConditon> => {
+  public parseSql = (sqlQuery: string): FilterQuery<MongoQuery> => {
     sqlQuery = sqlQuery.trim();
-    let sqlAst: SQLAST;
+    let sqlAst: SQLAst;
 
     if (/^where\s.*/gmi.test(sqlQuery)) {
       sqlQuery = `${SQLPREFIX} ${sqlQuery}`;
@@ -93,7 +100,7 @@ class SQLParser {
 
     if (/^select\s.*\sfrom\s\w+$/gmi.test(sqlQuery)) {
       try {
-        parser(sqlQuery);
+        this.parser.astify(sqlQuery);
         return {};
       } catch (error) {
         throw error;
@@ -101,12 +108,13 @@ class SQLParser {
     } else {
       if (/^select\s.*\sfrom\s.*\swhere\s.*/gmi.test(sqlQuery)) {
         try {
-          sqlAst = parser(sqlQuery);
+          sqlAst = this.parser.astify(sqlQuery) as unknown as SQLAst;
         } catch (error) {
           throw error;
         }
-        const { where } = sqlAst.statement[0];
-        return this.generateMongoQuery(where[0]);
+        const { where } = sqlAst;
+        const mongoQuery = this.generateMongoQuery(where);
+        return mongoQuery;
       } else {
         throw new Error('Invalid SQL statement, Please check your SQL statement.');
       }

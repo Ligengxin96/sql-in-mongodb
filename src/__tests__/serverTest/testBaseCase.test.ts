@@ -17,7 +17,7 @@ describe('Test base case', () => {
       const parser = new SQLParser();
       parser.parseSql(sqlWhereConditon);
     } catch (error) {
-      expect(error.message).toStrictEqual('Syntax error found near Column Identifier (WHERE Clause)');
+      expect(error.message).toStrictEqual(`Expected "#", "$", "'", "(", "+", "-", "--", "/*", ":", "?", "@", "@@", "AVG", "BINARY", "CASE", "CAST", "COUNT", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "CURRENT_USER", "DATE", "DATETIME", "FALSE", "INTERVAL", "MAX", "MIN", "NULL", "SESSION_USER", "SUM", "SYSTEM_USER", "TIME", "TIMESTAMP", "TRUE", "USER", "X", "\\\"", "\`", [ \\t\\n\\r], [0-9], or [A-Za-z_] but end of input found.`);
     }
   });
 
