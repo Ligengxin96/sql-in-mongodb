@@ -6,7 +6,7 @@ import PostModel from '../../models/post';
 
 dotenv.config();
 
-describe.skip('Dev Test', () => {
+describe.skip('Dev test base case', () => {
   beforeAll(() => {
     mongoose.connect(process.env.CONNECT_STRING as string, {
       useNewUrlParser: true,
