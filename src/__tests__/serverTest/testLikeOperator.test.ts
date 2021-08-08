@@ -36,6 +36,7 @@ describe('Test like operator', () => {
     const parser = new SQLParser();
     expect(parser.parseSql(`WHERE name like 'abc?%'`)).toStrictEqual({"name":{"$regex":"^abc\\?","$options":"i"}});
     expect(parser.parseSql(`WHERE name like 'a\\%'`)).toStrictEqual({"name":{"$regex":"^a\\\\","$options":"i"}});
+    expect(parser.parseSql(`WHERE name like '%$, (, ), *, +, ., [, ], ?, \\, ^, {, }, |%'`)).toStrictEqual({"name":{"$regex":".*\\$, \\(, \\), \\*, \\+, \\., \\[, \\], \\?, \\\\, \\^, \\{, \\}, \\|.*","$options":"i"}})
   });
 });
 

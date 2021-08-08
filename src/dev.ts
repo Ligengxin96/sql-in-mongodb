@@ -1,6 +1,6 @@
 import SQLParser from './index';
 
-const sqlWhereConditon = `WHERE title like 'a\\%'`;
+const sqlWhereConditon = `WHERE name like '%$, (, ), *, +, ., [, ], ?, \\, ^, {, }, |%'`;
 const parser = new SQLParser();
 const mongoQuery = parser.parseSql(sqlWhereConditon);
 

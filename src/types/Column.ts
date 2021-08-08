@@ -1,6 +1,6 @@
 import { ExpressionType } from './Common';
 
-export type Columns = { 
+export type Column = { 
   as: string,
   expr: {
     type: ExpressionType,

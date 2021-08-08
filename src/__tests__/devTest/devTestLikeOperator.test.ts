@@ -47,10 +47,18 @@ describe('Dev test like operator', () => {
     expect(String(data[0].name).endsWith('Graham'));
   });
 
-  it.only('Test simple statement with special characters', async () => {
-    const sqlWhereConditon = `WHERE name like 'abc?123$%'`;
+  it('Test simple statement with special characters', async () => {
+    let sqlWhereConditon = `WHERE name like 'abc?123$%'`;
     const parser = new SQLParser();
-    const data = await TestModel.find(parser.parseSql(sqlWhereConditon));
+    let data = await TestModel.find(parser.parseSql(sqlWhereConditon));
     expect(String(data[0].name).startsWith('abc?123$'));
+
+    sqlWhereConditon = `WHERE name like 'a\\%'`;
+    data = await TestModel.find(parser.parseSql(sqlWhereConditon));
+    expect(String(data[0].name)).toEqual('a\\bc');
+
+    sqlWhereConditon = `WHERE name like '%$, (, ), *, +, ., [, ], ?, \\, ^, {, }, |%'`;
+    data = await TestModel.find(parser.parseSql(sqlWhereConditon));
+    expect(String(data[0].name)).toEqual("123'$, (, ), *, +, ., [, ], ?, \\, ^, {, }, |'abc");
   });
 });

@@ -1,9 +1,9 @@
-import { Columns } from './Columns';
+import { Column } from './Column';
 import { From } from './From';
 import { Where } from './Where';
 
 export type SQLAst = {
-  columns: Array<Columns>;
+  column: Array<Column>;
   distinct: string | null,
   from: Array<From>,
   groupBy: string | null,
