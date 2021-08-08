@@ -38,15 +38,14 @@ class SQLParser {
   }
 
   private processLikeOperator(left: WhereLeftSubCondition, right: WhereRightSubCondition): FilterQuery<MongoQuery> {
-    // keep current value
-    const specialCharacters = ['\\', '$', '(', ')', '*', '+', '.', '[', ']', '?', '^', '{', '}', '|']; 
     const { column } = left;
     let { value } = right;
     let valueStr = String(value);
     let prefix = '';
     let suffix = '';
 
-    specialCharacters.forEach((c) => { valueStr = valueStr.replace(new RegExp(`\\${c}`, 'g'), `\\${c}`) });
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+    valueStr = valueStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     const values = valueStr.split('/%');
     const finalyValues = values.map((val) => {
@@ -136,11 +135,12 @@ class SQLParser {
       if (/^select\s.*\sfrom\s.*\swhere\s.*/gmi.test(sqlQuery)) {
         try {
           sqlAst = this.parser.astify(sqlQuery) as unknown as SQLAst;
+          const { where } = sqlAst;
+          return this.generateMongoQuery(where);
         } catch (error) {
+          console.log(error.message);
           throw error;
         }
-        const { where } = sqlAst;
-        return this.generateMongoQuery(where);
       } else {
         throw new Error('Invalid SQL statement, Please check your SQL statement.');
       }

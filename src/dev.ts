@@ -1,9 +1,9 @@
 import SQLParser from './index';
 
-const sqlWhereConditon = `WHERE title is not null`;
+const sqlWhereConditon = `WHERE title like 'a\\%'`;
 const parser = new SQLParser();
 const mongoQuery = parser.parseSql(sqlWhereConditon);
 
 
-console.log(`db.postmessages.find(${JSON.stringify(mongoQuery)})`);
+console.log(`db.test.find(${JSON.stringify(mongoQuery)})`);
 console.log(mongoQuery);

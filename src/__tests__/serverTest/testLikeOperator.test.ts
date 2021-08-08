@@ -32,11 +32,10 @@ describe('Test like operator', () => {
     expect(parser.parseSql(`WHERE title like '%/%%/%%'`)).toStrictEqual({"title":{"$regex":".*%.*%.*","$options":"i"}});
   });
 
-  it.skip('Test simple statement with special characters', async () => {
+  it('Test simple statement with special characters', async () => {
     const parser = new SQLParser();
-    // expect(parser.parseSql(`WHERE name like 'abc?%'`)).toStrictEqual({"name":{"$regex":"^abc\\?","$options":"i"}});
-    // expect(parser.parseSql(`WHERE name like 'abc\\%'`)).toStrictEqual({"name":{"$regex":"^abc\\\\","$options":"i"}});
-    expect(parser.parseSql(`WHERE name like 'a/%%'`)).toStrictEqual({"name":{"$regex":"^abc\\\\","$options":"i"}});
+    expect(parser.parseSql(`WHERE name like 'abc?%'`)).toStrictEqual({"name":{"$regex":"^abc\\?","$options":"i"}});
+    expect(parser.parseSql(`WHERE name like 'a\\%'`)).toStrictEqual({"name":{"$regex":"^a\\\\","$options":"i"}});
   });
 });
 
