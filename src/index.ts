@@ -35,14 +35,7 @@ class SQLParser {
       return null;
     }
     // todo handle date
-    // if (type === 'string') {
-    //     const valueStr = String(value);
-    //     const date = new Date(String(valueStr));
-    //     if (String(date) === 'Invalid Date') {
-    //       return valueStr;
-    //     }
-    //     return { $dateFromString: { dateString: valueStr, timezone: '$timezone' } };
-    // }
+    // mongodb sotre date as string so that can use $gte, $lte, $gt, $lt to find data
     return String(value);
   }
 
