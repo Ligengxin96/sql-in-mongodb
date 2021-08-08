@@ -1,6 +1,6 @@
 import SQLParser from './index';
 
-const sqlWhereConditon = `WHERE title = false`;
+const sqlWhereConditon = `WHERE title is not null`;
 const parser = new SQLParser();
 const mongoQuery = parser.parseSql(sqlWhereConditon);
 

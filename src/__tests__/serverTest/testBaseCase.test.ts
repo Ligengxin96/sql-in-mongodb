@@ -50,6 +50,9 @@ describe('Test base case', () => {
     expect(parser.parseSql(`select * from t WHERE number != 1.1`)).toStrictEqual({ number: { $ne: 1.1 } });
     expect(parser.parseSql(`select * from t WHERE boolean = true`)).toStrictEqual({ boolean: true });
     expect(parser.parseSql(`select * from t WHERE boolean = false`)).toStrictEqual({ boolean: false });
+    expect(parser.parseSql(`select * from t WHERE title is null`)).toStrictEqual({ title: null });
+    expect(parser.parseSql(`select * from t WHERE title is not null`)).toStrictEqual({ title: { $ne: null } });
+
   });
 
 
@@ -60,9 +63,28 @@ describe('Test base case', () => {
   });
 
   it('Test simple where statement with and', () => {
-    const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' and title = '123'`;
     const parser = new SQLParser();
-    expect(parser.parseSql(sqlWhereConditon)).toStrictEqual({ $and: [{ title: 'Land of the midnight sun' }, { title: '123' }] });
+    expect(parser.parseSql(`WHERE title = 'Land of the midnight sun' and title = '123'`)).toStrictEqual({ 
+      $and: 
+        [
+          { title: 'Land of the midnight sun' }, 
+          { title: '123' }
+        ]
+      });
+    expect(parser.parseSql(`select * from t WHERE title is null and title is not null`)).toStrictEqual({ 
+      $and: 
+        [
+          { title: null }, 
+          { title: { $ne: null } }
+        ]
+      });
+      expect(parser.parseSql(`select * from t WHERE title = '123' and title is not null`)).toStrictEqual({ 
+        $and: 
+          [
+            { title: '123' }, 
+            { title: { $ne: null } }
+          ]
+        });
   });
 
   it('Test simple where statement with or', () => {

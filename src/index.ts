@@ -1,9 +1,9 @@
 import { FilterQuery } from 'mongoose';
 import { Parser } from 'node-sql-parser';
 
-import { Option } from './types/Common';
 import { SQLAst } from './types/SQLAst';
 import { MongoQuery } from './types/MongoQuery';
+import { Option, RightSubConditionValue } from './types/Common';
 import { Where, WhereLeftSubCondition, WhereRightSubCondition } from './types/Where';
 
 const SQLPREFIX = 'SELECT * FROM SOMETABLE';
@@ -23,13 +23,16 @@ class SQLParser {
     this.option = option || DEFAULT_OPTIONS;
   }
 
-  private processRightValue(right: WhereRightSubCondition): string | number | boolean | Date | null {
+  private processRightValue(right: WhereRightSubCondition): RightSubConditionValue {
     const { value, type } = right;
     if (type === 'number') {
       return Number(value);
     }
     if (type === 'bool') {
       return Boolean(value);
+    }
+    if (type === 'null') {
+      return null;
     }
     return String(value);
   }
@@ -77,6 +80,7 @@ class SQLParser {
           return { [column]: this.processRightValue(right as WhereRightSubCondition) };
         case '!=':
         case '<>':
+        case 'is not':
           return { [column]: { $ne: this.processRightValue(right as WhereRightSubCondition) } };
         case '>': 
           return { [column]: { $gt: this.processRightValue(right as WhereRightSubCondition) } };
@@ -86,9 +90,18 @@ class SQLParser {
           return { [column]: { $gte: this.processRightValue(right as WhereRightSubCondition) } };
         case '<=':
           return { [column]: { $lte: this.processRightValue(right as WhereRightSubCondition) } };
+        case 'is':
+          return { [column]: this.processRightValue(right as WhereRightSubCondition) };
         case 'like':
           return this.processLikeOperator(left as WhereLeftSubCondition, right as WhereRightSubCondition);
+        // todo
         case 'not like':
+        case 'in':
+        case 'not in':
+        case 'between':
+        case 'not between':
+        case 'is null':
+        case 'is not null':
           return {};
         default:
           return {}
@@ -127,9 +140,7 @@ class SQLParser {
           throw error;
         }
         const { where } = sqlAst;
-        const mongoQuery = this.generateMongoQuery(where);
-       console.log(`db.test.find(${JSON.stringify(mongoQuery)})`)
-        return mongoQuery;
+        return this.generateMongoQuery(where);
       } else {
         throw new Error('Invalid SQL statement, Please check your SQL statement.');
       }
