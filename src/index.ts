@@ -23,7 +23,7 @@ class SQLParser {
     this.option = option || DEFAULT_OPTIONS;
   }
 
-  private processRightValue(right: WhereRightSubCondition): RightSubConditionValue {
+  private processRightValue(right: WhereRightSubCondition): RightSubConditionValue | any {
     const { value, type } = right;
     if (type === 'number') {
       return Number(value);
@@ -34,6 +34,15 @@ class SQLParser {
     if (type === 'null') {
       return null;
     }
+    // todo handle date
+    // if (type === 'string') {
+    //     const valueStr = String(value);
+    //     const date = new Date(String(valueStr));
+    //     if (String(date) === 'Invalid Date') {
+    //       return valueStr;
+    //     }
+    //     return { $dateFromString: { dateString: valueStr, timezone: '$timezone' } };
+    // }
     return String(value);
   }
 
@@ -69,51 +78,79 @@ class SQLParser {
   }
 
   private generateMongoQuery = (whereConditon: Where): FilterQuery<MongoQuery> => {
-    let { operator } = whereConditon;
-    const { left, right } = whereConditon;
-    operator = operator?.toLowerCase();
-    const { column } = left as WhereLeftSubCondition;
-    if (column) {
-      switch (operator) {
-        case '=':
-          return { [column]: this.processRightValue(right as WhereRightSubCondition) };
-        case '!=':
-        case '<>':
-        case 'is not':
-          return { [column]: { $ne: this.processRightValue(right as WhereRightSubCondition) } };
-        case '>': 
-          return { [column]: { $gt: this.processRightValue(right as WhereRightSubCondition) } };
-        case '<': 
-          return { [column]: { $lt: this.processRightValue(right as WhereRightSubCondition) } };
-        case '>=':
-          return { [column]: { $gte: this.processRightValue(right as WhereRightSubCondition) } };
-        case '<=':
-          return { [column]: { $lte: this.processRightValue(right as WhereRightSubCondition) } };
-        case 'is':
-          return { [column]: this.processRightValue(right as WhereRightSubCondition) };
-        case 'like':
-          return this.processLikeOperator(left as WhereLeftSubCondition, right as WhereRightSubCondition);
-        // todo
-        case 'not like':
-        case 'in':
-        case 'not in':
-        case 'between':
-        case 'not between':
-        case 'is null':
-        case 'is not null':
-          return {};
-        default:
-          return {}
+    try {
+      let { operator } = whereConditon;
+      const { left, right } = whereConditon;
+      operator = operator?.toLowerCase();
+      const { column: leftColumn, type: leftType } = left as WhereLeftSubCondition;
+      const { column: rightColumn, type: rightType } = right as WhereLeftSubCondition;
+      if (leftColumn) {
+        let isCompareColumn = false;
+        if (leftType === rightType && leftType === 'column_ref') {
+          isCompareColumn = true;
+        }
+        switch (operator) {
+          case '=':
+            if (isCompareColumn) {
+              return { $expr: { $eq: [`$${leftColumn}`, `$${rightColumn}`] } };
+            }
+            return { [leftColumn]: this.processRightValue(right as WhereRightSubCondition) };
+          case '!=':
+          case '<>':
+            if (isCompareColumn) {
+              return { $expr: { $ne: [`$${leftColumn}`, `$${rightColumn}`] } };
+            }
+            return { [leftColumn]: { $ne: this.processRightValue(right as WhereRightSubCondition) } };
+          case 'is not':
+            return { [leftColumn]: { $ne: this.processRightValue(right as WhereRightSubCondition) } };
+          case '>': 
+            if (isCompareColumn) {
+              return { $expr: { $gt: [`$${leftColumn}`, `$${rightColumn}`] } };
+            }
+            return { [leftColumn]: { $gt: this.processRightValue(right as WhereRightSubCondition) } };
+          case '<': 
+            if (isCompareColumn) {
+              return { $expr: { $lt: [`$${leftColumn}`, `$${rightColumn}`] } };
+            }
+            return { [leftColumn]: { $lt: this.processRightValue(right as WhereRightSubCondition) } };
+          case '>=':
+            if (isCompareColumn) {
+              return { $expr: { $gte: [`$${leftColumn}`, `$${rightColumn}`] } };
+            }
+            return { [leftColumn]: { $gte: this.processRightValue(right as WhereRightSubCondition) } };
+          case '<=':
+            if (isCompareColumn) {
+              return { $expr: { $lte: [`$${leftColumn}`, `$${rightColumn}`] } };
+            }
+            return { [leftColumn]: { $lte: this.processRightValue(right as WhereRightSubCondition) } };
+          case 'is':
+            return { [leftColumn]: this.processRightValue(right as WhereRightSubCondition) };
+          case 'like':
+            return this.processLikeOperator(left as WhereLeftSubCondition, right as WhereRightSubCondition);
+          // todo
+          case 'not like':
+          case 'in':
+          case 'not in':
+          case 'between':
+          case 'not between':
+          case 'is null':
+          case 'is not null':
+            return {};
+          default:
+            return {}
+        }
       }
-    }
-
-    if (right && left) {
-      if (CONDITION_OPERATORS.indexOf(operator) > -1) {
-        return { [`$${operator}`]: [this.generateMongoQuery(left as Where), this.generateMongoQuery(right as Where)] }
+  
+      if (right && left) {
+        if (CONDITION_OPERATORS.indexOf(operator) > -1) {
+          return { [`$${operator}`]: [this.generateMongoQuery(left as Where), this.generateMongoQuery(right as Where)] }
+        }
       }
+  
+      return {};
+    } catch (error) {
+      throw error;
     }
-
-    return {};
   };
 
   public parseSql = (sqlQuery: string): FilterQuery<MongoQuery> => {

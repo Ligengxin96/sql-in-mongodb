@@ -52,7 +52,9 @@ describe('Test base case', () => {
     expect(parser.parseSql(`select * from t WHERE boolean = false`)).toStrictEqual({ boolean: false });
     expect(parser.parseSql(`select * from t WHERE title is null`)).toStrictEqual({ title: null });
     expect(parser.parseSql(`select * from t WHERE title is not null`)).toStrictEqual({ title: { $ne: null } });
-
+    expect(parser.parseSql(`WHERE a != b`)).toStrictEqual({"$expr":{"$ne":["$a","$b"]}});
+    expect(parser.parseSql(`WHERE a > b and name = '123'`)).toStrictEqual({"$and":[{"$expr":{"$gt":["$a","$b"]}},{"name":"123"}]});
+    expect(parser.parseSql(`WHERE a <> b and name = '123'`)).toStrictEqual({"$and":[{"$expr":{"$ne":["$a","$b"]}},{"name":"123"}]});
   });
 
   it('Test simple where statement with and', () => {
