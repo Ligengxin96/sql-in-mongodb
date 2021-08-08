@@ -55,13 +55,6 @@ describe('Test base case', () => {
 
   });
 
-
-  it('Test simple where statement', () => {
-    const sqlWhereConditon = `WHERE title = 'Land of the midnight sun'`;
-    const parser = new SQLParser();
-    expect(parser.parseSql(sqlWhereConditon)).toStrictEqual({ title: 'Land of the midnight sun' });
-  });
-
   it('Test simple where statement with and', () => {
     const parser = new SQLParser();
     expect(parser.parseSql(`WHERE title = 'Land of the midnight sun' and title = '123'`)).toStrictEqual({ 
