@@ -2,13 +2,13 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import SQLParser from '../../index';
-import PostModel from '../../models/post';
+import TestModel from '../../models/testModel';
 
 dotenv.config();
 
 describe('Dev test like operator', () => {
   beforeAll(() => {
-    mongoose.connect(process.env.CONNECT_STRING as string, {
+    mongoose.connect(process.env.CONNECT_STRING_TEST as string, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -19,31 +19,38 @@ describe('Dev test like operator', () => {
   });
 
   it('Test simple statement start with like operator', async () => {
-    const sqlWhereConditon = `WHERE title like '%trees'`;
+    const sqlWhereConditon = `WHERE name like '%Graham'`;
     const parser = new SQLParser();
-    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
-    expect(String(posts[0].title).endsWith('trees'));
+    const data = await TestModel.find(parser.parseSql(sqlWhereConditon));
+    expect(String(data[0].name).endsWith('Graham'));
   });
 
   it('Test simple statement end with like operator', async () => {
-    const sqlWhereConditon = `WHERE title like 'Mangrove%'`;
+    const sqlWhereConditon = `WHERE name like 'Leanne%'`;
     const parser = new SQLParser();
-    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
-    expect(String(posts[0].title).startsWith('Mangrove'));
+    const data = await TestModel.find(parser.parseSql(sqlWhereConditon));
+    expect(String(data[0].name).startsWith('Leanne'));
   });
 
   it('Test simple statement start with like operator and should return []', async () => {
-    const sqlWhereConditon = `WHERE title like '%Mangrove'`;
+    const sqlWhereConditon = `WHERE name like '%Leanne'`;
     const parser = new SQLParser();
-    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
-    expect(posts.length).toEqual(0);
+    const data = await TestModel.find(parser.parseSql(sqlWhereConditon));
+    expect(data.length).toEqual(0);
   });
 
   it('Test simple statement end with like operator in middle of the string', async () => {
-    const sqlWhereConditon = `WHERE title like 'Mangrove%trees'`;
+    const sqlWhereConditon = `WHERE name like 'Leanne%Graham'`;
     const parser = new SQLParser();
-    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
-    expect(String(posts[0].title).startsWith('Mangrove'));
-    expect(String(posts[0].title).endsWith('trees'));
+    const data = await TestModel.find(parser.parseSql(sqlWhereConditon));
+    expect(String(data[0].name).startsWith('Leanne'));
+    expect(String(data[0].name).endsWith('Graham'));
+  });
+
+  it.only('Test simple statement with special characters', async () => {
+    const sqlWhereConditon = `WHERE name like 'abc?123$%'`;
+    const parser = new SQLParser();
+    const data = await TestModel.find(parser.parseSql(sqlWhereConditon));
+    expect(String(data[0].name).startsWith('abc?123$'));
   });
 });

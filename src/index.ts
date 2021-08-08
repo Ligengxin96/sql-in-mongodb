@@ -1,6 +1,7 @@
 import { FilterQuery } from 'mongoose';
 import { Parser } from 'node-sql-parser';
 
+import { Option } from './types/Common';
 import { SQLAst } from './types/SQLAst';
 import { MongoQuery } from './types/MongoQuery';
 import { Where, WhereLeftSubCondition, WhereRightSubCondition } from './types/Where';
@@ -9,10 +10,17 @@ const SQLPREFIX = 'SELECT * FROM SOMETABLE';
 
 const CONDITION_OPERATORS = ['and', 'or'];
 
+const DEFAULT_OPTIONS: Option = {
+  enableExec: false,
+}
+
 class SQLParser {
   parser: Parser;
-  constructor() {
+  option: Option
+  constructor(option?: Option) {
     this.parser = new Parser();
+    // Todo enable exec: don't return mongoQuery run the query direactly 
+    this.option = option || DEFAULT_OPTIONS;
   }
 
   private processRightValue(right: WhereRightSubCondition): string | number | boolean | Date | null {
@@ -27,29 +35,35 @@ class SQLParser {
   }
 
   private processLikeOperator(left: WhereLeftSubCondition, right: WhereRightSubCondition): FilterQuery<MongoQuery> {
+    // keep current value
+    const specialCharacters = ['\\', '$', '(', ')', '*', '+', '.', '[', ']', '?', '^', '{', '}', '|']; 
     const { column } = left;
     let { value } = right;
-    value = String(value);
+    let valueStr = String(value);
     let prefix = '';
     let suffix = '';
-    while (value.indexOf('%%') > -1) {
-      value = value.replace('%%', '%');
+
+    specialCharacters.forEach((c) => { valueStr = valueStr.replace(new RegExp(`\\${c}`, 'g'), `\\${c}`) });
+
+    const values = valueStr.split('/%');
+    const finalyValues = values.map((val) => {
+      while (val.indexOf('%%') > -1) {
+        val = val.replace('%%', '%');
+      }
+      return val.replace(/%/g, '.*');
+    });
+
+    let finallyStr = finalyValues.join('%');
+    if (/^(\.\*).*(?<!\.\*)$/gi.test(finallyStr)) {
+      finallyStr = finallyStr.substr(2);
+      suffix = '$'
     }
-    if (value.startsWith('%')) {
-      value = `${value.substr(1)}`;
-      if (!value) {
-        return { [column]: { $regex: '.*', $options: 'i' } };
-      } 
-      suffix = '$';
-    }
-    if (value.endsWith('%') && !value.endsWith('/%')) {
-      value = `${value.substr(0, value.length - 1)}`;
-      if (!value) {
-        return { [column]: { $regex: '.*', $options: 'i' } };
-      } 
+    if (/^(?!\.\*).*(\.\*)$/gi.test(finallyStr)) {
+      finallyStr = finallyStr.substr(0, finallyStr.length - 2);
       prefix = '^';
     }
-    return { [column]: { $regex: `${prefix}${value}${suffix}`.replace(/%/g, '.*'), $options: 'i' } };
+
+    return { [column]: { $regex: `${prefix}${finallyStr}${suffix}`, $options: 'i' } };
   }
 
   private generateMongoQuery = (whereConditon: Where): FilterQuery<MongoQuery> => {
@@ -114,6 +128,7 @@ class SQLParser {
         }
         const { where } = sqlAst;
         const mongoQuery = this.generateMongoQuery(where);
+       console.log(`db.test.find(${JSON.stringify(mongoQuery)})`)
         return mongoQuery;
       } else {
         throw new Error('Invalid SQL statement, Please check your SQL statement.');
@@ -123,3 +138,4 @@ class SQLParser {
 }
 
 export default SQLParser;
+
