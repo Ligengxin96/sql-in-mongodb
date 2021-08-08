@@ -29,3 +29,4 @@ jobs:
     - run: yarn test
       env:
           CONNECT_STRING: ${{ secrets.CONNECT_STRING }}
+          CONNECT_STRING_TEST: ${{ secrets.CONNECT_STRING_TEST }}
