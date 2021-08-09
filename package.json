@@ -6,7 +6,7 @@
     "email": "Ligengxin96@gmail.com"
   },
   "description": "parse sql to mongo query",
-  "license": "MIT",
+  "license": "GPLv3",
   "scripts": {
     "build": "tsc",
     "test": "npm run build && jest --collectCoverage",
