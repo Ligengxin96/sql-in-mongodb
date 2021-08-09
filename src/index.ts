@@ -11,7 +11,7 @@ const SQLPREFIX = 'SELECT * FROM SOMETABLE';
 const CONDITION_OPERATORS = ['and', 'or'];
 
 const DEFAULT_OPTIONS: Option = {
-  enableExec: false,
+  likeOpsCaseSensitive: false,
 }
 
 class SQLParser {
@@ -19,7 +19,6 @@ class SQLParser {
   option: Option
   constructor(option?: Option) {
     this.parser = new Parser();
-    // Todo enable exec: don't return mongoQuery run the query direactly 
     this.option = option || DEFAULT_OPTIONS;
   }
 
@@ -39,7 +38,7 @@ class SQLParser {
     return String(value);
   }
 
-  private processLikeOperator(left: WhereLeftSubCondition, right: WhereRightSubCondition): FilterQuery<MongoQuery> {
+  private processLikeOperator(left: WhereLeftSubCondition, right: WhereRightSubCondition, isLike: boolean): FilterQuery<MongoQuery> {
     const { column } = left;
     let { value } = right;
     let valueStr = String(value);
@@ -67,7 +66,15 @@ class SQLParser {
       prefix = '^';
     }
 
-    return { [column]: { $regex: `${prefix}${finallyStr}${suffix}`, $options: 'i' } };
+    const regexStr = `${prefix}${finallyStr}${suffix}`;
+
+    if (this.option.likeOpsCaseSensitive) {
+      return isLike ? { [column]: { $regex: regexStr } } 
+                  : { [column]: { $not: new RegExp(regexStr) } };
+    }
+
+    return isLike ? { [column]: { $regex: regexStr, $options: 'i' } } 
+                  : { [column]: { $not: new RegExp(regexStr, 'i') } };
   }
 
   private generateMongoQuery = (whereConditon: Where): FilterQuery<MongoQuery> => {
@@ -119,9 +126,9 @@ class SQLParser {
           case 'is':
             return { [leftColumn]: this.processRightValue(right as WhereRightSubCondition) };
           case 'like':
-            return this.processLikeOperator(left as WhereLeftSubCondition, right as WhereRightSubCondition);
-          // todo
+            return this.processLikeOperator(left as WhereLeftSubCondition, right as WhereRightSubCondition, true);
           case 'not like':
+            return this.processLikeOperator(left as WhereLeftSubCondition, right as WhereRightSubCondition, false);
           case 'in':
           case 'not in':
           case 'between':
