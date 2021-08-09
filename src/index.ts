@@ -33,8 +33,14 @@ class SQLParser {
     if (type === 'null') {
       return null;
     }
-    // todo handle date
-    // mongodb sotre date as string so that can use $gte, $lte, $gt, $lt to find data
+    if (type === 'string') {
+      const valueStr = String(value);
+      const date = new Date(valueStr);
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        return date;
+      }
+      return valueStr;
+    }
     return String(value);
   }
 

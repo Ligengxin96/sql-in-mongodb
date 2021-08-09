@@ -1,6 +1,6 @@
 import SQLParser from './index';
 
-const sqlWhereConditon = `WHERE name not like 'Leanne%'`;
+const sqlWhereConditon = `WHERE date = "2021-08-01"`;
 const parser = new SQLParser();
 const mongoQuery = parser.parseSql(sqlWhereConditon);
 

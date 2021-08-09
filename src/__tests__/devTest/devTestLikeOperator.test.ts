@@ -62,7 +62,7 @@ describe('Dev test like operator', () => {
     expect(String(data[0].name)).toEqual("123'$, (, ), *, +, ., [, ], ?, \\, ^, {, }, |'abc");
   });
 
-  it('Test statement with special characters', async () => {
+  it('Test not like statement with special characters', async () => {
     const sqlWhereConditon = `WHERE name not like 'abc?123$%'`;
     const parser = new SQLParser();
     const data = await TestModel.find(parser.parseSql(sqlWhereConditon));

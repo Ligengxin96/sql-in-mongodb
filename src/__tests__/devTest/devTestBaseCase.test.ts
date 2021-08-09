@@ -94,4 +94,11 @@ describe('Dev test base case', () => {
     expect(posts[0].title).toEqual('Land of the midnight sun');
     expect(posts[1].title).toEqual('Mangrove trees');
   });
+
+  it('Test where statement search data by date', async () => {
+    const sqlWhereConditon = `WHERE createdTime > "2021-08-05" and createdTime < "2021-08-06"`;
+    const parser = new SQLParser();
+    const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
+    expect(posts.every((post: any) => {  post.createdTime > new Date("2021-08-05") && post.createdTime < new Date("2021-08-06") }));
+  });
 });
