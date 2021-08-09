@@ -1,6 +1,6 @@
 import { ExpressionType, RightSubConditionValue } from './Common';
 
-export type WhereConditionDataType = 'single_quote_string' | 'number' | 'bool' | 'null' | 'string';
+export type WhereConditionDataType = 'single_quote_string' | 'number' | 'bool' | 'null' | 'string' | 'expr_list';
 
 export type WhereLeftSubCondition = {
   type: ExpressionType;

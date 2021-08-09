@@ -24,6 +24,7 @@ class SQLParser {
 
   private processRightValue(right: WhereRightSubCondition): RightSubConditionValue | any {
     const { value, type } = right;
+    const valueStr = String(value);
     if (type === 'number') {
       return Number(value);
     }
@@ -33,20 +34,24 @@ class SQLParser {
     if (type === 'null') {
       return null;
     }
+    if (type === 'expr_list') {
+      if (Array.isArray(value)) {
+        return value.map((v) => v.value);
+      }
+      return [];
+    }
     if (type === 'string') {
-      const valueStr = String(value);
       const date = new Date(valueStr);
       if (date instanceof Date && !isNaN(date.getTime())) {
         return date;
       }
-      return valueStr;
     }
-    return String(value);
+    return valueStr;
   }
 
   private processLikeOperator(left: WhereLeftSubCondition, right: WhereRightSubCondition, isLike: boolean): FilterQuery<MongoQuery> {
     const { column } = left;
-    let { value } = right;
+    const { value } = right;
     let valueStr = String(value);
     let prefix = '';
     let suffix = '';
@@ -76,7 +81,7 @@ class SQLParser {
 
     if (this.option.likeOpsCaseSensitive) {
       return isLike ? { [column]: { $regex: regexStr } } 
-                  : { [column]: { $not: new RegExp(regexStr) } };
+                    : { [column]: { $not: new RegExp(regexStr) } };
     }
 
     return isLike ? { [column]: { $regex: regexStr, $options: 'i' } } 
@@ -136,11 +141,11 @@ class SQLParser {
           case 'not like':
             return this.processLikeOperator(left as WhereLeftSubCondition, right as WhereRightSubCondition, false);
           case 'in':
+            return { [leftColumn]: { $in: this.processRightValue(right as WhereRightSubCondition) } };
           case 'not in':
+            return { [leftColumn]: { $nin: this.processRightValue(right as WhereRightSubCondition) } };
           case 'between':
           case 'not between':
-          case 'is null':
-          case 'is not null':
             return {};
           default:
             return {}
