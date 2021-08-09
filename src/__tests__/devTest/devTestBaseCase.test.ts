@@ -99,6 +99,7 @@ describe('Dev test base case', () => {
     const sqlWhereConditon = `WHERE createdTime > "2021-08-05" and createdTime < "2021-08-06"`;
     const parser = new SQLParser();
     const posts = await PostModel.find(parser.parseSql(sqlWhereConditon));
+    expect(posts.length > 1);
     expect(posts.every((post: any) => {  post.createdTime > new Date("2021-08-05") && post.createdTime < new Date("2021-08-06") }));
   });
 });

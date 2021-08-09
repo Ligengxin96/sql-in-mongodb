@@ -1,6 +1,6 @@
 import SQLParser from './index';
 
-const sqlWhereConditon = `WHERE name in (null, 'a%bcd')`;
+const sqlWhereConditon = `WHERE createdTime not between "2021-06-26" and "2021-06-27" and createdTime > "2021-06-24" and createdTime < "2021-06-28"`;
 const parser = new SQLParser();
 const mongoQuery = parser.parseSql(sqlWhereConditon);
 

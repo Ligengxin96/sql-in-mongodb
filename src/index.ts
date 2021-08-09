@@ -22,7 +22,16 @@ class SQLParser {
     this.option = option || DEFAULT_OPTIONS;
   }
 
-  private processRightValue(right: WhereRightSubCondition): RightSubConditionValue | any {
+  private processRightValue(right: WhereRightSubCondition, operator?: string): RightSubConditionValue | any {
+
+    const processDate = (value: any): Date | String => {
+      const date = new Date(value);
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        return date;
+      }
+      return value;
+    }
+
     const { value, type } = right;
     const valueStr = String(value);
     if (type === 'number') {
@@ -36,15 +45,15 @@ class SQLParser {
     }
     if (type === 'expr_list') {
       if (Array.isArray(value)) {
+        if (operator === 'between') {
+          return { $gte: processDate(value[0].value), $lte: processDate(value[1].value) };
+        }
         return value.map((v) => v.value);
       }
       return [];
     }
     if (type === 'string') {
-      const date = new Date(valueStr);
-      if (date instanceof Date && !isNaN(date.getTime())) {
-        return date;
-      }
+      return processDate(valueStr)
     }
     return valueStr;
   }
@@ -145,8 +154,9 @@ class SQLParser {
           case 'not in':
             return { [leftColumn]: { $nin: this.processRightValue(right as WhereRightSubCondition) } };
           case 'between':
+            return { [leftColumn]: this.processRightValue(right as WhereRightSubCondition, 'between') };
           case 'not between':
-            return {};
+            return { [leftColumn]: { $not: this.processRightValue(right as WhereRightSubCondition, 'between') } };
           default:
             return {}
         }
