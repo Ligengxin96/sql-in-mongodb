@@ -21,7 +21,7 @@ describe('Test base case', () => {
     }
   });
 
-  it('Test simple wrong sql query', () => {
+  it('Test wrong sql query', () => {
     try {
       const sqlQuery = `select from t WHERE title = 'error'`;
       const parser = new SQLParser();
@@ -31,13 +31,13 @@ describe('Test base case', () => {
     }
   });
 
-  it('Test simple sql query', () => {
+  it('Test sql query', () => {
     const sqlQuery = `select * from t`;
     const parser = new SQLParser();
     expect(parser.parseSql(sqlQuery)).toStrictEqual({});
   });
 
-  it('Test simple sql query with where condition', () => {
+  it('Test sql query with where condition', () => {
     const parser = new SQLParser();
     expect(parser.parseSql(`select * from t WHERE title = 'this is title'`)).toStrictEqual({ title: 'this is title' });
     expect(parser.parseSql(`select * from t WHERE number = 123`)).toStrictEqual({ number: 123 });
@@ -57,7 +57,7 @@ describe('Test base case', () => {
     expect(parser.parseSql(`WHERE a <> b and name = '123'`)).toStrictEqual({"$and":[{"$expr":{"$ne":["$a","$b"]}},{"name":"123"}]});
   });
 
-  it('Test simple where statement with and', () => {
+  it('Test where statement with and', () => {
     const parser = new SQLParser();
     expect(parser.parseSql(`WHERE title = 'Land of the midnight sun' and title = '123'`)).toStrictEqual({ 
       $and: 
@@ -82,13 +82,13 @@ describe('Test base case', () => {
         });
   });
 
-  it('Test simple where statement with or', () => {
+  it('Test where statement with or', () => {
     const sqlWhereConditon = `WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees'`;
     const parser = new SQLParser();
     expect(parser.parseSql(sqlWhereConditon)).toStrictEqual({ $or: [{ title: 'Land of the midnight sun' }, { title: 'Mangrove trees' }] });
   });
 
-  it('Test simple where statement with and && or', async () => {
+  it('Test where statement with and && or', async () => {
     const sqlWhereConditon = `
       WHERE title = 'Land of the midnight sun' and title = 'Mangrove trees' 
       or message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
@@ -102,7 +102,7 @@ describe('Test base case', () => {
     });
   });
 
-  it('Test simple where statement with or && and', async () => {
+  it('Test where statement with or && and', async () => {
     const sqlWhereConditon = `
       WHERE title = 'Land of the midnight sun' or title = 'Mangrove trees' 
       and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)'`;
@@ -118,7 +118,7 @@ describe('Test base case', () => {
       });
   });
 
-  it('Test simple where statement with duplicate and && or conditon', async () => {
+  it('Test where statement with duplicate and && or conditon', async () => {
     const sqlWhereConditon = `
       WHERE title = 'Land of the midnight sun' and title = 'Land of the midnight sun'
       or title = 'Mangrove trees' or title = 'Mangrove trees'`;
@@ -138,7 +138,7 @@ describe('Test base case', () => {
     });
   });
 
-  it('Test simple where statement with and && or, brackets', async () => {
+  it('Test where statement with and && or, brackets', async () => {
     const sqlWhereConditon = `
       WHERE title = 'Land of the midnight sun' 
       and (message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)' 
@@ -154,7 +154,7 @@ describe('Test base case', () => {
       }]});
   });
 
-  it('Test simple where statement with and,brackets && or', async () => {
+  it('Test where statement with and,brackets && or', async () => {
     const sqlWhereConditon = `
       WHERE (title = 'Land of the midnight sun' 
       and message = 'copyright: Seljalandsfoss waterfall in the South Region of Iceland (© Tom Mackie/plainpicture)') 
