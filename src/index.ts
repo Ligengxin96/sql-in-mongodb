@@ -12,6 +12,7 @@ const CONDITION_OPERATORS = ['and', 'or'];
 
 const DEFAULT_OPTIONS: Option = {
   likeOpsCaseSensitive: false,
+  database: 'mysql', // todo support multiple databases
 }
 
 class SQLParser {
@@ -23,7 +24,6 @@ class SQLParser {
   }
 
   private processRightValue(right: WhereRightSubCondition, operator?: string): RightSubConditionValue | any {
-
     const processDate = (value: any): Date | String => {
       const date = new Date(value);
       if (date instanceof Date && !isNaN(date.getTime())) {
