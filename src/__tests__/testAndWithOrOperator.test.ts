@@ -1,4 +1,4 @@
-import SQLParser from '../../index';
+import SQLParser from '../index';
 
 describe('Test or operator', () => {
   it('Test where statement with and && or', async () => {

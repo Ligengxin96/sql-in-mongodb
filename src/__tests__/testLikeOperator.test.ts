@@ -1,4 +1,4 @@
-import SQLParser from '../../index';
+import SQLParser from '../index';
 
 describe('Test like operator', () => {
   it('Test statement with %', () => {
