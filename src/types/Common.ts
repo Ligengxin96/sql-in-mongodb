@@ -3,5 +3,6 @@ export type RightSubConditionValue = string | number | boolean | Date | null;
 
 export type Option = {
   likeOpsCaseSensitive: boolean,
+  multipleLineSql: boolean,
   database: string,
 }

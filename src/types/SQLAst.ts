@@ -3,7 +3,7 @@ import { From } from './From';
 import { Where } from './Where';
 
 export type SQLAst = {
-  column: Array<Column>;
+  columns: Array<Column> | string;
   distinct: string | null,
   from: Array<From>,
   groupBy: string | null,

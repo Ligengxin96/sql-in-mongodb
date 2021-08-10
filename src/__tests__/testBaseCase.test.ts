@@ -65,5 +65,6 @@ describe('Test base case', () => {
     expect(parser.parseSql(`WHERE a = b`)).toStrictEqual({ $expr: { $eq: ["$a", "$b"] } });
     expect(parser.parseSql(`WHERE name in (null, 'a%bcd')`)).toStrictEqual({ name: { $in: [null, "a%bcd"] } });
     expect(parser.parseSql(`WHERE name not in (null, 'a%bcd')`)).toStrictEqual({ name: { $nin: [null, "a%bcd"] } });
+    expect(parser.parseSql(`select a as b from t where a = 1`)).toStrictEqual({ a: 1 });
   });
 });

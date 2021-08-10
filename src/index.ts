@@ -12,6 +12,7 @@ const CONDITION_OPERATORS = ['and', 'or'];
 
 const DEFAULT_OPTIONS: Option = {
   likeOpsCaseSensitive: false,
+  multipleLineSql: false,
   database: 'mysql', // todo support multiple databases
 }
 
@@ -174,36 +175,73 @@ class SQLParser {
     }
   };
 
-  public parseSql = (sqlQuery: string): FilterQuery<MongoQuery> => {
+  private preCheckSql = (sqlQuery: string): SQLAst | Array<SQLAst> | null => {
     sqlQuery = sqlQuery.trim();
-    let sqlAst: SQLAst;
-
     if (/^where\s.*/gmi.test(sqlQuery)) {
       sqlQuery = `${SQLPREFIX} ${sqlQuery}`;
     }
-
-    if (/^select\s.*\sfrom\s\w+$/gmi.test(sqlQuery)) {
+    if (/^select\s.*\sfrom\s\w+$/gmi.test(sqlQuery) || /^select\s.*\sfrom\s.*\swhere\s.*/gmi.test(sqlQuery)) {
       try {
-        this.parser.astify(sqlQuery);
-        return {};
+        const sqlAsts = this.parser.astify(sqlQuery) as unknown as SQLAst;
+        if (this.option.multipleLineSql) {
+          return sqlAsts;
+        }
+        return Array.isArray(sqlAsts) ? sqlAsts[0] : sqlAsts;
       } catch (error) {
         throw error;
       }
     } else {
-      if (/^select\s.*\sfrom\s.*\swhere\s.*/gmi.test(sqlQuery)) {
-        try {
-          sqlAst = this.parser.astify(sqlQuery) as unknown as SQLAst;
-          const { where } = sqlAst;
-          return this.generateMongoQuery(where);
-        } catch (error) {
-          console.log(error.message);
-          throw error;
-        }
-      } else {
-        throw new Error('Invalid SQL statement, Please check your SQL statement.');
-      }
+      throw new Error('Invalid SQL statement, Please check your SQL statement.');
     }
+  }
+
+  public parseSql = (sqlQuery: string): FilterQuery<MongoQuery> => {
+    const processAst = (ast: SQLAst): FilterQuery<MongoQuery> => {
+      const { where } = ast;
+      if (where) {
+        return this.generateMongoQuery(where);
+      }
+      return {};
+    }
+
+    const sqlAst = this.preCheckSql(sqlQuery);
+    if (Array.isArray(sqlAst)) {
+      return sqlAst.map(ast => processAst(ast));
+    }
+    if (sqlAst && !Array.isArray(sqlAst)) {
+        return processAst(sqlAst);
+    } 
+    return {};
   };
+
+  public getSelectedFeilds = (sqlQuery: string): FilterQuery<MongoQuery> => {
+    const processAst = (ast: SQLAst): FilterQuery<MongoQuery> => {
+      const { columns } = ast;
+      if (columns === '*') {
+        return {};
+      }
+      if (Array.isArray(columns)) {
+        let fileds: FilterQuery<MongoQuery> = {} ;
+        columns.forEach((col) => {
+          const { column, type } = col.expr;
+          if (type === 'column_ref') {
+            fileds[column] = 1;
+          }
+        });
+        return fileds;
+      }
+      return {};
+    }
+
+    const sqlAst = this.preCheckSql(sqlQuery);
+    if (Array.isArray(sqlAst)) {
+      return sqlAst.map(ast => processAst(ast));
+    }
+    if (sqlAst) {
+      return processAst(sqlAst);
+    }
+    return {};
+  }
 }
 
 export default SQLParser;

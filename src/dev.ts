@@ -1,10 +1,12 @@
 import SQLParser from './index';
 
-const sqlWhereConditon = `WHERE createdTime not between "2021-06-26" and "2021-06-27" and createdTime > "2021-06-24" and createdTime < "2021-06-28"`;
+const sqlWhereConditon = `select a, b, c, 1 as d from t where a =1; select t from t where c = d`;
 const parser = new SQLParser();
 const mongoQuery = parser.parseSql(sqlWhereConditon);
+const selectedColumns = parser.getSelectedFeilds(sqlWhereConditon);
 
 
+console.log(selectedColumns);
 console.log(`db.test.find(${JSON.stringify(mongoQuery)})`);
 console.log(mongoQuery);
 
