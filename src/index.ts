@@ -25,12 +25,15 @@ class SQLParser {
   }
 
   private processRightValue(right: WhereRightSubCondition, operator?: string): RightSubConditionValue | any {
-    const processDate = (value: any): Date | String => {
-      const date = new Date(value);
-      if (date instanceof Date && !isNaN(date.getTime())) {
-        return date;
+    const processDate = (value: { type: string, value: any }): Date | String => {
+      const { type, value: valueStr } = value;
+      if (type === 'string') {
+        const date = new Date(valueStr);
+        if (date instanceof Date && !isNaN(date.getTime())) {
+          return date;
+        }
       }
-      return value;
+      return valueStr;
     }
 
     const { value, type } = right;
@@ -47,14 +50,14 @@ class SQLParser {
     if (type === 'expr_list') {
       if (Array.isArray(value)) {
         if (operator === 'between') {
-          return { $gte: processDate(value[0].value), $lte: processDate(value[1].value) };
+          return { $gte: processDate(value[0]), $lte: processDate(value[1]) };
         }
         return value.map((v) => v.value);
       }
       return [];
     }
     if (type === 'string') {
-      return processDate(valueStr)
+      return processDate({ type: 'string', value: valueStr })
     }
     return valueStr;
   }
@@ -90,19 +93,22 @@ class SQLParser {
     const regexStr = `${prefix}${finallyStr}${suffix}`;
 
     if (this.option.likeOpsCaseSensitive) {
-      return isLike ? { [column]: { $regex: regexStr } } 
-                    : { [column]: { $not: new RegExp(regexStr) } };
+      return isLike ? { [column]: { $regex: regexStr } }
+        : { [column]: { $not: new RegExp(regexStr) } };
     }
 
-    return isLike ? { [column]: { $regex: regexStr, $options: 'i' } } 
-                  : { [column]: { $not: new RegExp(regexStr, 'i') } };
+    return isLike ? { [column]: { $regex: regexStr, $options: 'i' } }
+      : { [column]: { $not: new RegExp(regexStr, 'i') } };
   }
 
   private generateMongoQuery = (whereConditon: Where): FilterQuery<MongoQuery> => {
     try {
       let { operator } = whereConditon;
       const { left, right } = whereConditon;
-      operator = operator?.toLowerCase();
+      if (!left && !right && operator) {
+        throw new Error(`Operator '${operator}' not currently supported.`);
+      }
+      operator = operator.toLowerCase();
       const { column: leftColumn, type: leftType } = left as WhereLeftSubCondition;
       const { column: rightColumn, type: rightType } = right as WhereLeftSubCondition;
       if (leftColumn) {
@@ -124,12 +130,12 @@ class SQLParser {
             return { [leftColumn]: { $ne: this.processRightValue(right as WhereRightSubCondition) } };
           case 'is not':
             return { [leftColumn]: { $ne: this.processRightValue(right as WhereRightSubCondition) } };
-          case '>': 
+          case '>':
             if (isCompareColumn) {
               return { $expr: { $gt: [`$${leftColumn}`, `$${rightColumn}`] } };
             }
             return { [leftColumn]: { $gt: this.processRightValue(right as WhereRightSubCondition) } };
-          case '<': 
+          case '<':
             if (isCompareColumn) {
               return { $expr: { $lt: [`$${leftColumn}`, `$${rightColumn}`] } };
             }
@@ -159,16 +165,16 @@ class SQLParser {
           case 'not between':
             return { [leftColumn]: { $not: this.processRightValue(right as WhereRightSubCondition, 'between') } };
           default:
-            return {}
+            throw new Error(`Operator '${operator.toUpperCase()}' not currently supported.`);
         }
       }
-  
+
       if (right && left) {
         if (CONDITION_OPERATORS.indexOf(operator) > -1) {
           return { [`$${operator}`]: [this.generateMongoQuery(left as Where), this.generateMongoQuery(right as Where)] }
         }
       }
-  
+
       return {};
     } catch (error) {
       throw error;
@@ -199,6 +205,7 @@ class SQLParser {
     const processAst = (ast: SQLAst): FilterQuery<MongoQuery> => {
       const { where } = ast;
       if (where) {
+        console.log(JSON.stringify(this.generateMongoQuery(where)));
         return this.generateMongoQuery(where);
       }
       return {};
@@ -209,8 +216,9 @@ class SQLParser {
       return sqlAst.map(ast => processAst(ast));
     }
     if (sqlAst && !Array.isArray(sqlAst)) {
-        return processAst(sqlAst);
-    } 
+
+      return processAst(sqlAst);
+    }
     return {};
   };
 
@@ -221,7 +229,7 @@ class SQLParser {
         return {};
       }
       if (Array.isArray(columns)) {
-        let fileds: FilterQuery<MongoQuery> = {} ;
+        let fileds: FilterQuery<MongoQuery> = {};
         columns.forEach((col) => {
           const { column, type } = col.expr;
           if (type === 'column_ref') {

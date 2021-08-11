@@ -38,6 +38,12 @@ describe('Test base case', () => {
     } catch (error) {
       expect(error.message).toStrictEqual('Invalid SQL statement, Please check your SQL statement.');
     }
+
+    try {
+      parser.parseSql(`select * from t1 where not exists (select * from t2)`)
+    } catch (error) {
+      expect(error.message).toStrictEqual(`Operator 'NOT EXISTS' not currently supported.`);
+    }
   });
 
   it('Test sql query', () => {
@@ -49,6 +55,7 @@ describe('Test base case', () => {
   it('Test sql query with where condition', () => {
     const parser = new SQLParser();
     expect(parser.parseSql(`select * from t WHERE title = 'this is title'`)).toStrictEqual({ title: 'this is title' });
+    expect(parser.parseSql(`select * from t WHERE date = "2021-08-10"`)).toStrictEqual({ date: new Date("2021-08-10") });
     expect(parser.parseSql(`select * from t where number = 123`)).toStrictEqual({ number: 123 });
     expect(parser.parseSql(`select * from t WHERE number = 123.456`)).toStrictEqual({ number: 123.456 });
     expect(parser.parseSql(`select * from t where number > 456.231`)).toStrictEqual({ number: { $gt: 456.231 } });
@@ -62,9 +69,31 @@ describe('Test base case', () => {
     expect(parser.parseSql(`select * from t WHERE title is null`)).toStrictEqual({ title: null });
     expect(parser.parseSql(`select * from t where title is not null`)).toStrictEqual({ title: { $ne: null } });
     expect(parser.parseSql(`WHERE a != b`)).toStrictEqual({ $expr: { $ne: ["$a", "$b"] } });
+    expect(parser.parseSql(`WHERE a <> b`)).toStrictEqual({ $expr: { $ne: ["$a", "$b"] } });
     expect(parser.parseSql(`WHERE a = b`)).toStrictEqual({ $expr: { $eq: ["$a", "$b"] } });
+    expect(parser.parseSql(`WHERE a > b`)).toStrictEqual({ $expr: { $gt: ["$a", "$b"] } });
+    expect(parser.parseSql(`WHERE a < b`)).toStrictEqual({ $expr: { $lt: ["$a", "$b"] } });
+    expect(parser.parseSql(`WHERE a >= b`)).toStrictEqual({ $expr: { $gte: ["$a", "$b"] } });
+    expect(parser.parseSql(`WHERE a <= b`)).toStrictEqual({ $expr: { $lte: ["$a", "$b"] } });
     expect(parser.parseSql(`WHERE name in (null, 'a%bcd')`)).toStrictEqual({ name: { $in: [null, "a%bcd"] } });
     expect(parser.parseSql(`WHERE name not in (null, 'a%bcd')`)).toStrictEqual({ name: { $nin: [null, "a%bcd"] } });
     expect(parser.parseSql(`select a as b from t where a = 1`)).toStrictEqual({ a: 1 });
+    expect(parser.parseSql(`where date between "2021-08-10" and "2021-08-11"`)).toStrictEqual(
+      { date: { "$gte": new Date("2021-08-10"), "$lte": new Date("2021-08-11") } }
+    );
+    expect(parser.parseSql(`where date between '2021-08-10' and '2021-08-11'`)).toStrictEqual(
+      { date: { "$gte": '2021-08-10', "$lte": '2021-08-11' } }
+    );
+    expect(parser.parseSql(`where date not between "2021-08-10" and "2021-08-11"`)).toStrictEqual(
+      { date: { $not: { "$gte": new Date("2021-08-10"), "$lte": new Date("2021-08-11") } } }
+    );
+  });
+
+  // todo: support system function
+  it.skip('Test sql query with system function', () => {
+    const parser = new SQLParser();
+    expect(parser.parseSql(`where date between "2021-08-10" and current_date()`)).toStrictEqual(
+      { date: { $not: { "$gte": new Date("2021-08-10"), "$lte": new Date() } } }
+    );
   });
 });

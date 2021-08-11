@@ -1,6 +1,6 @@
 import SQLParser from './index';
 
-const sqlWhereConditon = `select a, b, c, 1 as d from t where a =1; select t from t where c = d`;
+const sqlWhereConditon = `select * from t1 where not exists (select * from t2)`;
 const parser = new SQLParser();
 const mongoQuery = parser.parseSql(sqlWhereConditon);
 const selectedColumns = parser.getSelectedFeilds(sqlWhereConditon);
