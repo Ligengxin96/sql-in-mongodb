@@ -110,7 +110,24 @@ class SQLParser {
       }
       operator = operator.toLowerCase();
       const { column: leftColumn, type: leftType } = left as WhereLeftSubCondition;
-      const { column: rightColumn, type: rightType } = right as WhereLeftSubCondition;
+      const { column: rightColumn, type: rightType, value } = right as WhereRightSubCondition;
+      if (rightType === 'expr_list') {
+        const exprs: string[] = []; 
+        try {
+          if (Array.isArray(value)){
+            value.forEach((v) => {
+              if (v.type === 'select') {
+                exprs.push(this.parser.sqlify(v));
+              }
+            });
+          }
+        } catch (error) {
+          throw error;
+        }
+        if (exprs.length > 0) {
+          throw new Error(`The value: '${exprs.join(';')}' on the ${operator.toUpperCase()} operator right is not currently supported.`);
+        }
+      }
       if (leftColumn) {
         let isCompareColumn = false;
         if (leftType === rightType && leftType === 'column_ref') {

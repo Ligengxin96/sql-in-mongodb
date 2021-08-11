@@ -44,6 +44,11 @@ describe('Test base case', () => {
     } catch (error) {
       expect(error.message).toStrictEqual(`Operator 'NOT EXISTS' not currently supported.`);
     }
+    try {
+      parser.parseSql(`select * from t1 where id in(select id from t2)`)
+    } catch (error) {
+      expect(error.message).toStrictEqual("The value: 'SELECT `id` FROM `t2`' on the IN operator right is not currently supported.");
+    }
   });
 
   it('Test sql query', () => {
