@@ -225,7 +225,6 @@ class SQLParser {
     const processAst = (ast: SQLAst): FilterQuery<MongoQuery> => {
       const { where } = ast;
       if (where) {
-        console.log(JSON.stringify(this.generateMongoQuery(where)));
         return this.generateMongoQuery(where);
       }
       return {};

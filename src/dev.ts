@@ -1,6 +1,10 @@
 import SQLParser from './index';
 
-const sqlWhereConditon = `select * from t1 where id in(select id from t2)`;
+const sqlWhereConditon = `
+select * from t WHERE title >= 123 or title <= 234 
+or title in ('1', '2') or id between 1 and 2
+or title = '123' or title is not null
+`;
 const parser = new SQLParser({multipleLineSql: true});
 const mongoQuery = parser.parseSql(sqlWhereConditon);
 const selectedColumns = parser.getSelectedFeilds(sqlWhereConditon);

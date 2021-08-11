@@ -26,5 +26,34 @@ describe('Test or operator', () => {
     expect(parser.parseSql(`select * from t WHERE title in ('1', '2') or id between 1 and 2`)).toStrictEqual(
       { $or: [{ title: { $in: ["1", "2"] } }, { id: { $gte: 1, $lte: 2 } }] }
     );
+    expect(parser.parseSql(`
+      select * from t WHERE title >= 123 or title <= 234 
+      or title in ('1', '2') or id between 1 and 2
+      or title = '123' or title is not null
+    `
+    )).toStrictEqual({
+        $or:
+          [{
+            $or:
+              [{
+                $or:
+                  [{
+                    $or:
+                      [{
+                        $or: [
+                          { title: { $gte: 123 } },
+                          { title: { $lte: 234 } }
+                        ]
+                      },
+                      { title: { $in: ["1", "2"] } }
+                      ]
+                  },
+                  { id: { $gte: 1, $lte: 2 } }]
+              }, { title: "123" }
+              ]
+          },
+          { title: { $ne: null } }
+          ]
+    });
   });
 });
