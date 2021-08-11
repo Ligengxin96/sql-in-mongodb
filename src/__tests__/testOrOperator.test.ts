@@ -20,5 +20,11 @@ describe('Test or operator', () => {
     expect(parser.parseSql(`select * from t WHERE title = '123' or title is not null`)).toStrictEqual(
       { $or: [{ title: '123' }, { title: { $ne: null } }] }
     );
+    expect(parser.parseSql(`select * from t WHERE title >= 123 or title <= 234`)).toStrictEqual(
+      { $or: [{ title: { $gte: 123 } }, { title: { $lte: 234 } }] }
+    );
+    expect(parser.parseSql(`select * from t WHERE title in ('1', '2') or id between 1 and 2`)).toStrictEqual(
+      { $or: [{ title: { $in: ["1", "2"] } }, { id: { $gte: 1, $lte: 2 } }] }
+    );
   });
 });

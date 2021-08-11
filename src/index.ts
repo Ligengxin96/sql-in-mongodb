@@ -21,7 +21,7 @@ class SQLParser {
   option: Option
   constructor(option?: Option) {
     this.parser = new Parser();
-    this.option = option || DEFAULT_OPTIONS;
+    this.option = {...DEFAULT_OPTIONS, ...option};
   }
 
   private processRightValue(right: WhereRightSubCondition, operator?: string): RightSubConditionValue | any {
@@ -104,6 +104,9 @@ class SQLParser {
   private generateMongoQuery = (whereConditon: Where): FilterQuery<MongoQuery> => {
     try {
       let { operator } = whereConditon;
+      if (!operator) {
+        throw new Error('Invalid SQL statement, Please check your SQL statement where condition.');
+      }
       const { left, right } = whereConditon;
       if (!left && !right && operator) {
         throw new Error(`Operator '${operator}' not currently supported.`);
@@ -233,7 +236,6 @@ class SQLParser {
       return sqlAst.map(ast => processAst(ast));
     }
     if (sqlAst && !Array.isArray(sqlAst)) {
-
       return processAst(sqlAst);
     }
     return {};

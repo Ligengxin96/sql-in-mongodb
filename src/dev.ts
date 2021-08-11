@@ -1,7 +1,7 @@
 import SQLParser from './index';
 
 const sqlWhereConditon = `select * from t1 where id in(select id from t2)`;
-const parser = new SQLParser();
+const parser = new SQLParser({multipleLineSql: true});
 const mongoQuery = parser.parseSql(sqlWhereConditon);
 const selectedColumns = parser.getSelectedFeilds(sqlWhereConditon);
 

@@ -6,50 +6,63 @@ describe('Test base case', () => {
     try {
       parser.parseSql('');
     } catch (error) {
-      expect(error.message).toStrictEqual('Invalid SQL statement, Please check your SQL statement.');
+      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
     }
 
     try {
       parser.parseSql('WHERE error = ');
     } catch (error) {
-      expect(error.message).toStrictEqual(`Expected "#", "$", "'", "(", "+", "-", "--", "/*", ":", "?", "@", "@@", "AVG", "BINARY", "CASE", "CAST", "COUNT", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "CURRENT_USER", "DATE", "DATETIME", "FALSE", "INTERVAL", "MAX", "MIN", "NULL", "SESSION_USER", "SUM", "SYSTEM_USER", "TIME", "TIMESTAMP", "TRUE", "USER", "X", "\\\"", "\`", [ \\t\\n\\r], [0-9], or [A-Za-z_] but end of input found.`);
+      expect(error.message).toBe(`Expected "#", "$", "'", "(", "+", "-", "--", "/*", ":", "?", "@", "@@", "AVG", "BINARY", "CASE", "CAST", "COUNT", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "CURRENT_USER", "DATE", "DATETIME", "FALSE", "INTERVAL", "MAX", "MIN", "NULL", "SESSION_USER", "SUM", "SYSTEM_USER", "TIME", "TIMESTAMP", "TRUE", "USER", "X", "\\\"", "\`", [ \\t\\n\\r], [0-9], or [A-Za-z_] but end of input found.`);
+    }
+
+    try {
+      expect(parser.parseSql(`select * from t WHERE date`));
+    } catch (error) {
+      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement where condition.');
+    }
+
+    try {
+      expect(parser.parseSql(`select * from t WHERE id in (select id from t2 where id)`));
+    } catch (error) {
+      expect(error.message).toBe("The value: 'SELECT `id` FROM `t2` WHERE `id`' on the IN operator right is not currently supported.");
     }
 
     try {
       parser.parseSql(`select from t WHERE title = 'error'`)
     } catch (error) {
-      expect(error.message).toStrictEqual('Invalid SQL statement, Please check your SQL statement.');
+      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
     }
 
     try {
       parser.parseSql(`select from WHERE title = 'error'`)
     } catch (error) {
-      expect(error.message).toStrictEqual('Invalid SQL statement, Please check your SQL statement.');
+      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
     }
 
     try {
       parser.parseSql(`select from t title = 'error'`)
     } catch (error) {
-      expect(error.message).toStrictEqual('Invalid SQL statement, Please check your SQL statement.');
+      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
     }
 
     try {
       parser.parseSql(`select from t WHERE title`)
     } catch (error) {
-      expect(error.message).toStrictEqual('Invalid SQL statement, Please check your SQL statement.');
+      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
     }
 
     try {
       parser.parseSql(`select * from t1 where not exists (select * from t2)`)
     } catch (error) {
-      expect(error.message).toStrictEqual(`Operator 'NOT EXISTS' not currently supported.`);
+      expect(error.message).toBe(`Operator 'NOT EXISTS' not currently supported.`);
     }
 
     try {
       parser.parseSql(`select * from t1 where id in(select id from t2)`)
     } catch (error) {
-      expect(error.message).toStrictEqual("The value: 'SELECT `id` FROM `t2`' on the IN operator right is not currently supported.");
+      expect(error.message).toBe("The value: 'SELECT `id` FROM `t2`' on the IN operator right is not currently supported.");
     }
+
   });
 
   it('Test sql query', () => {

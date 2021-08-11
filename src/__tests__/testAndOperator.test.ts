@@ -18,6 +18,12 @@ describe('Test and operator', () => {
     expect(parser.parseSql(`select * from t WHERE title = '123' and title is not null`)).toStrictEqual(
       { $and: [{ title: '123' }, { title: { $ne: null } }] }
     );
+    expect(parser.parseSql(`select * from t WHERE title >= 123 and title <= 234`)).toStrictEqual(
+      { $and: [{ title: { $gte: 123 } }, { title: { $lte: 234 } }] }
+    );
+    expect(parser.parseSql(`select * from t WHERE title in ('1', '2') and id between 1 and 2`)).toStrictEqual(
+      { $and: [{ title: { $in: ["1", "2"] } }, { id: { $gte: 1, $lte: 2 } }] }
+    );
   });
 
 });
