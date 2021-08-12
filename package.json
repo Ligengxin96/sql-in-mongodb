@@ -1,12 +1,31 @@
 {
   "name": "sql-in-mongodb",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "author": {
     "name": "Ligengxin96",
     "email": "Ligengxin96@gmail.com"
   },
+  "main": "./dist/src/index.js",
   "description": "parse SQL to MongoDB query",
   "license": "GPL-3.0",
+  "homepage": "https://github.com/Ligengxin96/SQL-in-MongoDB#README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ligengxin96/SQL-in-MongoDB.git"
+  },
+  "bugs":{
+    "url": "https://github.com/Ligengxin96/SQL-in-MongoDB/issues"
+  },
+  "keywords": [
+    "node",
+    "nodejs",
+    "parser",
+    "parse",
+    "sql",
+    "mongodb",
+    "sql query",
+    "mongodb query"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "yarn run build && jest --collectCoverage",
