@@ -1,4 +1,4 @@
-import SQLParser from '../index';
+import SQLParser from '../src/index';
 
 describe('Test base case', () => {
   it('Test wrong sql query', () => {

@@ -10,9 +10,9 @@
   "scripts": {
     "build": "tsc",
     "test": "yarn run build && jest --collectCoverage",
-    "test-dev": "yarn run build && jest ./src/__tests__/devTest/*.test.ts --collectCoverage",
-    "tslint-check": "tslint --project tsconfig.json ./src/**/*.ts",
-    "tslint-fix": "tslint --fix --project tsconfig.json ./src/**/*.ts",
+    "test-dev": "yarn run build && jest ./test/devTest/*.test.ts --collectCoverage",
+    "tslint-check": "tslint --project tsconfig.json ./src/**/*.ts ./test/**/*.ts",
+    "tslint-fix": "tslint --fix --project tsconfig.json ./src/**/*.ts ./test/**/*.ts",
     "prepack": "yarn install && tsc && yarn run tslint-check"
   },
   "dependencies": {

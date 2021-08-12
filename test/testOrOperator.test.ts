@@ -1,4 +1,4 @@
-import SQLParser from '../index';
+import SQLParser from '../src/index';
 
 describe('Test or operator', () => {
   it('Test where condition with or operator', () => {

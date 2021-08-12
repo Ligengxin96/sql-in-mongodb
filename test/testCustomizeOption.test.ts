@@ -1,4 +1,4 @@
-import SQLParser from '../index';
+import SQLParser from '../src/index';
 
 describe('Test customize option', () => {
   it('Test likeOpsCaseSensitive = true', () => {
