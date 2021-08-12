@@ -8,7 +8,7 @@
   "main": "./dist/src/index.js",
   "description": "parse SQL to MongoDB query",
   "license": "GPL-3.0",
-  "homepage": "https://github.com/Ligengxin96/SQL-in-MongoDB#README.md",
+  "homepage": "https://github.com/Ligengxin96/SQL-in-MongoDB#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ligengxin96/SQL-in-MongoDB.git"
