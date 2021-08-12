@@ -23,6 +23,9 @@ describe('Test or operator', () => {
     expect(parser.parseSql(`select * from t WHERE title >= 123 or title <= 234`)).toStrictEqual(
       { $or: [{ title: { $gte: 123 } }, { title: { $lte: 234 } }] }
     );
+    expect(parser.parseSql(`select * from t WHERE title like '123%' or date between "2021-08-10" and "2021-08-11"`)).toStrictEqual(
+      { $or: [{ title: { $regex: "^123", $options: "i" } }, { date: { $gte: new Date("2021-08-10"), $lte: new Date("2021-08-11") } }] }
+    );
     expect(parser.parseSql(`select * from t WHERE title in ('1', '2') or id between 1 and 2`)).toStrictEqual(
       { $or: [{ title: { $in: ["1", "2"] } }, { id: { $gte: 1, $lte: 2 } }] }
     );

@@ -201,17 +201,17 @@ class SQLParser {
     }
   };
 
-  private preCheckSql = (sqlQuery: string): SQLAst | Array<SQLAst> | null => {
+  private preCheckSql = (sqlQuery: string): SQLAst | SQLAst[] => {
     sqlQuery = sqlQuery.trim();
     if (/^where\s.*/gmi.test(sqlQuery)) {
       sqlQuery = `${SQLPREFIX} ${sqlQuery}`;
     }
     if (/^select\s.*\sfrom\s\w+$/gmi.test(sqlQuery) || /^select\s.*\sfrom\s.*\swhere\s.*/gmi.test(sqlQuery)) {
       try {
-        const sqlAsts = this.parser.astify(sqlQuery) as unknown as SQLAst;
+        const sqlAsts = this.parser.astify(sqlQuery) as unknown as SQLAst | SQLAst[];
         if (this.option.multipleLineSql) {
           return sqlAsts;
-        }
+        } 
         return Array.isArray(sqlAsts) ? sqlAsts[0] : sqlAsts;
       } catch (error) {
         throw error;
@@ -231,12 +231,12 @@ class SQLParser {
     }
 
     const sqlAst = this.preCheckSql(sqlQuery);
-    if (Array.isArray(sqlAst)) {
-      return sqlAst.map(ast => processAst(ast));
-    }
-    if (sqlAst && !Array.isArray(sqlAst)) {
+    if (sqlAst) {
+      if (Array.isArray(sqlAst)) {
+        return sqlAst.map(ast => processAst(ast));
+      } 
       return processAst(sqlAst);
-    }
+    } 
     return {};
   };
 
