@@ -226,6 +226,10 @@ class SQLParser {
   }
 
   public parseSql = (sqlQuery: string): FilterQuery<MongoQuery> => {
+    if (!sqlQuery || !sqlQuery.trim()) {
+      return {};
+    }
+
     const processAst = (ast: SQLAst): FilterQuery<MongoQuery> => {
       const { where } = ast;
       if (where) {
@@ -245,6 +249,10 @@ class SQLParser {
   };
 
   public getSelectedFeilds = (sqlQuery: string): FilterQuery<MongoQuery> => {
+    if (!sqlQuery || !sqlQuery.trim()) {
+      return {};
+    }
+
     const processAst = (ast: SQLAst): FilterQuery<MongoQuery> => {
       const { columns } = ast;
       if (columns === '*') {

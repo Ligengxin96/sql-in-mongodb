@@ -4,12 +4,6 @@ describe('Test base case', () => {
   it('Test wrong sql query', () => {
     const parser = new SQLParser();
     try {
-      parser.parseSql('');
-    } catch (error) {
-      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
-    }
-
-    try {
       parser.parseSql('WHERE error = ');
     } catch (error) {
       expect(error.message).toBe(`Expected "#", "$", "'", "(", "+", "-", "--", "/*", ":", "?", "@", "@@", "AVG", "BINARY", "CASE", "CAST", "COUNT", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "CURRENT_USER", "DATE", "DATETIME", "FALSE", "INTERVAL", "MAX", "MIN", "NULL", "SESSION_USER", "SUM", "SYSTEM_USER", "TIME", "TIMESTAMP", "TRUE", "USER", "X", "\\\"", "\`", [ \\t\\n\\r], [0-9], or [A-Za-z_] but end of input found.`);
@@ -67,6 +61,8 @@ describe('Test base case', () => {
 
   it('Test sql query', () => {
     const parser = new SQLParser();
+    expect(parser.parseSql('')).toStrictEqual({});
+    expect(parser.parseSql('  ')).toStrictEqual({});
     expect(parser.parseSql(`select * from t`)).toStrictEqual({});
     expect(parser.parseSql(`select a, b, c from t`)).toStrictEqual({});
   });
