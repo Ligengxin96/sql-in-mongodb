@@ -104,16 +104,19 @@ class SQLParser {
   private generateMongoQuery = (whereConditon: Where): FilterQuery<MongoQuery> => {
     try {
       let { operator } = whereConditon;
+      const { left, right } = whereConditon;
+
       if (!operator) {
         throw new Error('Invalid SQL statement, Please check your SQL statement where condition.');
       }
-      const { left, right } = whereConditon;
       if (!left && !right && operator) {
         throw new Error(`Operator '${operator}' not currently supported.`);
       }
+
       operator = operator.toLowerCase();
       const { column: leftColumn, type: leftType } = left as WhereLeftSubCondition;
       const { column: rightColumn, type: rightType, value } = right as WhereRightSubCondition;
+
       if (rightType === 'expr_list') {
         const exprs: string[] = []; 
         try {
@@ -127,10 +130,12 @@ class SQLParser {
         } catch (error) {
           throw error;
         }
+
         if (exprs.length > 0) {
           throw new Error(`The value: '${exprs.join(';')}' on the ${operator.toUpperCase()} operator right is not currently supported.`);
         }
       }
+
       if (leftColumn) {
         let isCompareColumn = false;
         if (leftType === rightType && leftType === 'column_ref') {
@@ -194,7 +199,6 @@ class SQLParser {
           return { [`$${operator}`]: [this.generateMongoQuery(left as Where), this.generateMongoQuery(right as Where)] }
         }
       }
-
       return {};
     } catch (error) {
       throw error;
@@ -260,12 +264,12 @@ class SQLParser {
     }
 
     const sqlAst = this.preCheckSql(sqlQuery);
-    if (Array.isArray(sqlAst)) {
-      return sqlAst.map(ast => processAst(ast));
-    }
     if (sqlAst) {
+      if (Array.isArray(sqlAst)) {
+        return sqlAst.map(ast => processAst(ast));
+      } 
       return processAst(sqlAst);
-    }
+    } 
     return {};
   }
 }
