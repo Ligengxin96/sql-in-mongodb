@@ -25,7 +25,7 @@ describe('Test and operator', () => {
       { $and: [{ title: { $in: ["1", "2"] } }, { id: { $gte: 1, $lte: 2 } }] }
     );
     expect(parser.parseSql(`
-      select * from t WHERE title >= 123 and title <= 234 
+      select * from t WHERE title >= 123 and title <= 234
       and title in ('1', '2') and id between 1 and 2
       and title = '123' and title is not null
     `

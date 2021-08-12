@@ -8,13 +8,13 @@ const postSchema = new mongoose.Schema({
     creatorId: String,
     tags: [String],
     selectedFile: String,
-    likes: { 
-        type: [String], 
-        default: [] 
+    likes: {
+        type: [String],
+        default: []
     },
-    comments: { 
-        type: [String], 
-        default: [] 
+    comments: {
+        type: [String],
+        default: []
     },
     createdTime: {
         type: Date,

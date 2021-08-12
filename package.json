@@ -1,23 +1,23 @@
 {
-  "name": "sqlToMongoQuery",
+  "name": "sql-in-mongodb",
   "version": "1.0.0",
   "author": {
     "name": "Ligengxin96",
     "email": "Ligengxin96@gmail.com"
   },
-  "description": "parse sql to mongo query",
-  "license": "GPLv3",
+  "description": "parse SQL to MongoDB query",
+  "license": "GPL-3.0",
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && jest --collectCoverage",
-    "test-dev": "npm run build && jest ./src/__tests__/devTest/*.test.ts --collectCoverage",
-    "tslint": "tslint --project tsconfig.json ./*.ts ./lib/**/*.ts ./test/**/*.ts ./types/**/*.ts",
-    "tslint-fix": "tslint --fix --project tsconfig.json ./*.ts ./lib/**/*.ts ./test/**/*.ts ./types/**/*.ts",
-    "tslint-check": "tslint-config-prettier-check ./tslint.json",
-    "prepack": "npm install && tsc && npm run tslint"
+    "test": "yarn run build && jest --collectCoverage",
+    "test-dev": "yarn run build && jest ./src/__tests__/devTest/*.test.ts --collectCoverage",
+    "tslint-check": "tslint --project tsconfig.json ./src/**/*.ts",
+    "tslint-fix": "tslint --fix --project tsconfig.json ./src/**/*.ts",
+    "prepack": "yarn install && tsc && yarn run tslint-check"
   },
   "dependencies": {
-    "node-sql-parser": "^3.6.1"
+    "node-sql-parser": "^3.6.1",
+    "mongoose": "^5.13.4"
   },
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
@@ -32,7 +32,6 @@
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^27.0.6",
-    "mongoose": "^5.13.4",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.4",
     "ts-node": "^10.1.0",

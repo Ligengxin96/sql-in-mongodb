@@ -94,11 +94,11 @@ class SQLParser {
 
     if (this.option.likeOpsCaseSensitive) {
       return isLike ? { [column]: { $regex: regexStr } }
-        : { [column]: { $not: new RegExp(regexStr) } };
+                    : { [column]: { $not: new RegExp(regexStr) } };
     }
 
     return isLike ? { [column]: { $regex: regexStr, $options: 'i' } }
-      : { [column]: { $not: new RegExp(regexStr, 'i') } };
+                  : { [column]: { $not: new RegExp(regexStr, 'i') } };
   }
 
   private generateMongoQuery = (whereConditon: Where): FilterQuery<MongoQuery> => {

@@ -1,4 +1,4 @@
 export type MongoQuery = {
-  $and?: Array<{ [key: string]: unknown }>;
-  $or?: Array<{ [key: string]: unknown }>;
+  $and?: { [key: string]: unknown }[];
+  $or?: { [key: string]: unknown }[];
 };

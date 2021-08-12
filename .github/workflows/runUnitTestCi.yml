@@ -26,6 +26,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: yarn
+    - run: yarn run tslint-check
     - run: yarn test
       env:
           CONNECT_STRING: ${{ secrets.CONNECT_STRING }}

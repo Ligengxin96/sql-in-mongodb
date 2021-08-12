@@ -20,9 +20,9 @@ describe('Test or operator', () => {
       { $and: [{ title: "Land" }, { $or: [{ message: "(© Tom Mackie/plainpicture)" }, { title: "Mangrove" }] }] }
     );
     expect(parser.parseSql(`WHERE (title = 'Land' and message = '(© Tom Mackie/plainpicture)') or title = 'Mangrove'`)).toStrictEqual(
-      { $or: [{ $and: [{ title: "Land" }, { message: "(© Tom Mackie/plainpicture)" },] }, { title: "Mangrove" }] }
+      { $or: [{ $and: [{ title: "Land" }, { message: "(© Tom Mackie/plainpicture)" } ] }, { title: "Mangrove" }] }
     );
-    expect(parser.parseSql(`where (a = 1 or b = 2) and c = 3`)).toStrictEqual({ $and: [{ $or: [{ a: 1 }, { b: 2 },] }, { c: 3 }] });
+    expect(parser.parseSql(`where (a = 1 or b = 2) and c = 3`)).toStrictEqual({ $and: [{ $or: [{ a: 1 }, { b: 2 }, ] }, { c: 3 }] });
     expect(parser.parseSql(`where (a = 1) or b = 2 and c = 3`)).toStrictEqual({ $or: [{ a: 1 }, { $and: [{ b: 2 }, { c: 3 }] }] });
     expect(parser.parseSql(`where (a = '1' and b = 2) or c = 3`)).toStrictEqual({ $or: [{ $and: [{ a: "1" }, { b: 2 }] }, { c: 3 }] });
     expect(parser.parseSql(`where a = 1 or (b = 2) and c = 3`)).toStrictEqual({ "$or": [{ "a": 1 }, { $and: [{ "b": 2 }, { "c": 3 }] }] });
