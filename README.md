@@ -59,3 +59,6 @@ const DEFAULT_OPTIONS: Option = {
 }
 ```
 
+## Todo
+1. Support cli 
+2. Support each database advanced query statement, only suppport common sql query now
