@@ -32,7 +32,8 @@
     "test-dev": "yarn run build && jest ./test/devTest/*.test.ts --collectCoverage",
     "tslint-check": "tslint --project tsconfig.json ./src/**/*.ts ./test/**/*.ts",
     "tslint-fix": "tslint --fix --project tsconfig.json ./src/**/*.ts ./test/**/*.ts",
-    "prepack": "yarn && tsc && yarn run tslint-check"
+    "prepack": "yarn && tsc && yarn run tslint-check",
+    "coverall": "cat coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "mongoose": "^5.13.4",
@@ -45,6 +46,7 @@
     "@types/node": "^16.4.1",
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
+    "coveralls": "^3.1.1",
     "eslint": "^7.31.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",

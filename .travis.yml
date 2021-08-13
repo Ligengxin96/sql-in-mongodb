@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - 12
+  - 14
+  - 15
+  - 16
+install:
+  - yarn
+before_script:
+  - yarn run build
+script:
+  - yarn run test
+after_success: 
+  - yarn run coverall
