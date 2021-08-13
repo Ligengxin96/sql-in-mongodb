@@ -14,7 +14,7 @@ If we have a complex query condition, use mongodb query we should write complex 
 ```bash
 npm install sql-in-mongodb
 ```
-Or
+or
 
 ```bash
 yarn add sql-in-mongodb
