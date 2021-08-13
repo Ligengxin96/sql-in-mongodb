@@ -67,6 +67,6 @@ describe('Test customize option', () => {
       { number: { $ne: 1.1 } }
     ]);
     expect(parser.getSelectedTable(`select * from t1,t2; select t3.a, t4.b from t3, t4; select * from t5 where a = 1`)).toStrictEqual(['t1', 't3', 't5']);
-  }); 
+  });
 });
 
