@@ -2,9 +2,11 @@
 
 This tools can convert common sql query to mongodb query. Support node version >= 12
 
+Why we need this tool? If we have a complex query condition, use mongodb query we should write complex json object, and sometime we often missing the brackets, but use this tools, we just need write an simple sql query, and it can convert it to mongodb query.
+
 ## How to use
 ```js
-import SQLParser from 'sql-in-mongodb';
+import SQLParser from 'sql-in-mongodb'; // for commonjs:  const SQLParser = require('sql-in-mongodb');
 // database data: {a: 1, b: 2}
 const sqlQuery = `where a = 1`; // you also can use: `select * from tablename where a = 1`
 const parser = new SQLParser();
