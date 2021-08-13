@@ -24,25 +24,25 @@ describe('Test base case', () => {
     try {
       parser.parseSql(`select from t WHERE title = 'error'`)
     } catch (error) {
-      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
+      expect(error.message).toBe('Invalid SQL statement or the SQL statement not currently supported.');
     }
 
     try {
       parser.parseSql(`select from WHERE title = 'error'`)
     } catch (error) {
-      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
+      expect(error.message).toBe('Invalid SQL statement or the SQL statement not currently supported.');
     }
 
     try {
       parser.parseSql(`select from t title = 'error'`)
     } catch (error) {
-      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
+      expect(error.message).toBe('Invalid SQL statement or the SQL statement not currently supported.');
     }
 
     try {
       parser.parseSql(`select from t WHERE title`)
     } catch (error) {
-      expect(error.message).toBe('Invalid SQL statement, Please check your SQL statement.');
+      expect(error.message).toBe('Invalid SQL statement or the SQL statement not currently supported.');
     }
 
     try {

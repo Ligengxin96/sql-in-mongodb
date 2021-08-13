@@ -6,7 +6,7 @@ import { MongoQuery } from './types/MongoQuery';
 import { Option, RightSubConditionValue } from './types/Common';
 import { Where, WhereLeftSubCondition, WhereRightSubCondition } from './types/Where';
 
-const SQLPREFIX = 'SELECT * FROM SOMETABLE';
+const SQLPREFIX = 'SELECT * FROM UNKNOWN';
 
 const CONDITION_OPERATORS = ['and', 'or'];
 
@@ -221,11 +221,11 @@ class SQLParser {
         throw error;
       }
     } else {
-      throw new Error('Invalid SQL statement, Please check your SQL statement.');
+      throw new Error('Invalid SQL statement or the SQL statement not currently supported.');
     }
   }
 
-  public parseSql = (sqlQuery: string): FilterQuery<MongoQuery> => {
+  public parseSql = (sqlQuery: string): FilterQuery<MongoQuery> | FilterQuery<MongoQuery>[] => {
     if (!sqlQuery || !sqlQuery.trim()) {
       return {};
     }
@@ -248,7 +248,7 @@ class SQLParser {
     return {};
   };
 
-  public getSelectedFeilds = (sqlQuery: string): FilterQuery<MongoQuery> => {
+  public getSelectedFeilds = (sqlQuery: string): FilterQuery<MongoQuery> | FilterQuery<MongoQuery>[] => {
     if (!sqlQuery || !sqlQuery.trim()) {
       return {};
     }
@@ -279,6 +279,27 @@ class SQLParser {
       return processAst(sqlAst);
     }
     return {};
+  }
+
+  public getSelectedTable = (sqlQuery: string): string | string[] => {
+    if (!sqlQuery || !sqlQuery.trim()) {
+      return 'UNKNOWN';
+    }
+
+    const processAst = (ast: SQLAst): string => {
+      const { from } = ast;
+      return from[0].table;
+    }
+
+    const sqlAst = this.preCheckSql(sqlQuery);
+    if (sqlAst) {
+      if (Array.isArray(sqlAst)) {
+        return sqlAst.map(ast => processAst(ast));
+      } else {
+        return processAst(sqlAst);
+      }
+    }
+    return 'UNKNOWN';
   }
 }
 
