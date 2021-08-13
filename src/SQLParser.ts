@@ -25,7 +25,7 @@ class SQLParser {
   }
 
   private processRightValue(right: WhereRightSubCondition, operator?: string): RightSubConditionValue | any {
-    const processDate = (value: { type: string, value: any }): Date | String => {
+    const processDate = (value: { type: string, value: any }): Date | string => {
       const { type, value: valueStr } = value;
       if (type === 'string') {
         const date = new Date(valueStr);
@@ -118,7 +118,7 @@ class SQLParser {
       const { column: rightColumn, type: rightType, value } = right as WhereRightSubCondition;
 
       if (rightType === 'expr_list') {
-        const exprs: string[] = []; 
+        const exprs: string[] = [];
         try {
           if (Array.isArray(value)){
             value.forEach((v) => {
@@ -215,7 +215,7 @@ class SQLParser {
         const sqlAsts = this.parser.astify(sqlQuery) as unknown as SQLAst | SQLAst[];
         if (this.option.multipleLineSql) {
           return sqlAsts;
-        } 
+        }
         return Array.isArray(sqlAsts) ? sqlAsts[0] : sqlAsts;
       } catch (error) {
         throw error;
@@ -242,9 +242,9 @@ class SQLParser {
     if (sqlAst) {
       if (Array.isArray(sqlAst)) {
         return sqlAst.map(ast => processAst(ast));
-      } 
+      }
       return processAst(sqlAst);
-    } 
+    }
     return {};
   };
 
@@ -259,7 +259,7 @@ class SQLParser {
         return {};
       }
       if (Array.isArray(columns)) {
-        let fileds: FilterQuery<MongoQuery> = {};
+        const fileds: FilterQuery<MongoQuery> = {};
         columns.forEach((col) => {
           const { column, type } = col.expr;
           if (type === 'column_ref') {
@@ -275,9 +275,9 @@ class SQLParser {
     if (sqlAst) {
       if (Array.isArray(sqlAst)) {
         return sqlAst.map(ast => processAst(ast));
-      } 
+      }
       return processAst(sqlAst);
-    } 
+    }
     return {};
   }
 }

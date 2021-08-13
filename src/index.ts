@@ -9,9 +9,9 @@ import { Where } from "./types/Where";
 export {
   SQLParser,
   Column,
-  ExpressionType, 
-  RightSubConditionValue, 
-  Database, 
+  ExpressionType,
+  RightSubConditionValue,
+  Database,
   Option,
   From,
   MongoQuery,
