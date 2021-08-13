@@ -4,11 +4,11 @@
 
 This tools can convert common sql query to mongodb query. Support node version >= 12
 
-## Why we need this tool
+## :star: Why we need this tool
 
 If we have a complex query condition, use mongodb query we should write complex json object, and sometime we often missing the brackets, but use this tools, we just need write an simple sql query, and it can convert it to mongodb query.
 
-## How to use
+## :rocket: How to use
 
 ### 1. install dependency
 ```bash
@@ -43,7 +43,7 @@ const data = await TestModel.findOne(mongoQuery, selectedFileds);
 console.log(JSON.stringify(data)); // output {a: 1, b: 2}
 ```
 
-## SQLParser() Option parameters
+## :question: SQLParser() Option parameters
 ```ts
 export type Option = {
   likeOpsCaseSensitive?: boolean, // if true, the like operator will be case sensitive
@@ -59,6 +59,6 @@ const DEFAULT_OPTIONS: Option = {
 }
 ```
 
-## Todo
+## :eyes: Todo
 1. Support cli 
 2. Support each database advanced query statement, only suppport common sql query now
