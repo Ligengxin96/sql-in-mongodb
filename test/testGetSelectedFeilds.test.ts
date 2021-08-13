@@ -1,4 +1,4 @@
-import SQLParser from '../src/index';
+import SQLParser from '../src/SQLParser';
 
 describe('Test getSelectedFeilds function', () => {
   it('Test getSelectedFeilds function', () => {

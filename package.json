@@ -1,6 +1,6 @@
 {
-  "name": "sql-in-mongodb",
-  "version": "0.0.1",
+  "name": "sql-in-mongo",
+  "version": "1.0.2-privatepreview",
   "author": {
     "name": "Ligengxin96",
     "email": "Ligengxin96@gmail.com"
@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/Ligengxin96/SQL-in-MongoDB.git"
   },
-  "bugs":{
+  "bugs": {
     "url": "https://github.com/Ligengxin96/SQL-in-MongoDB/issues"
   },
   "keywords": [
@@ -35,8 +35,9 @@
     "prepack": "yarn && tsc && yarn run tslint-check"
   },
   "dependencies": {
+    "mongoose": "^5.13.4",
     "node-sql-parser": "^3.6.1",
-    "mongoose": "^5.13.4"
+    "tslib": "^2.3.1"
   },
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
