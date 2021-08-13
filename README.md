@@ -9,7 +9,7 @@ This tools can convert common sql query to mongodb query. Support node version >
 
 ## :star: Why we need this tool
 
-If we have a complex query condition, use mongodb query we should write complex json object, and sometime we often missing the brackets, but use this tools, we just need write an simple sql query, and it can convert it to mongodb query.
+If we have a complex query condition, use mongodb query we should write complex json object, and sometime we often missing the brackets, but use this tools, we just need write a simple sql query and convert it to mongodb query by this tool.
 
 ## :rocket: How to use
 
