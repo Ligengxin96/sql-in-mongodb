@@ -1,6 +1,10 @@
 # SQL-in-MongoDB
 
+[![Build Status](https://travis-ci.com/Ligengxin96/sql-in-mongodb.svg?branch=main)](https://travis-ci.com/Ligengxin96/sql-in-mongodb)
+
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d923c9f2853f44f295c383d9943b56cc)](https://www.codacy.com/manual/Ligengxin96/SQL-in-MongoDB?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Ligengxin96/SQL-in-MongoDB&amp;utm_campaign=Badge_Grade)
+
+[![Coverage Status](https://coveralls.io/repos/github/Ligengxin96/sql-in-mongodb/badge.svg?branch=main)](https://coveralls.io/github/Ligengxin96/sql-in-mongodb?branch=main)
 
 This tools can convert common sql query to mongodb query. Support node version >= 12
 
