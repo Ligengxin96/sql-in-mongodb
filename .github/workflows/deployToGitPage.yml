@@ -2,7 +2,7 @@ name: Build & Deploy CI
 
 on:
   push:
-    branches: [ demo ]
+    branches: [ demoSrc ]
   
 jobs:
   build:
