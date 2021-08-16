@@ -110,8 +110,10 @@ const  App = () => {
         </div>
       </div>
       <div style={{ textAlign: 'center', alignItems: 'center', color: '#e6db74', paddingTop: '2rem', height: '9.7vh' }}>
-        <h4 style={{ margin: '0' }}>SQL-in-MongoDB</h4>
-        <h4 style={{ margin: '0' }}>© Ligengxin@gmail.com</h4>
+        <a title="SQL-in-MongoDB on GitHub" href="https://github.com/Ligengxin96/sql-in-mongodb" target="_blank" rel="noreferrer" style={{ textDecoration: 'none'}}>
+          <h4 style={{ margin: '0', color: '#e6db74' }}>SQL-in-MongoDB</h4>
+        </a>
+        <h4 style={{ margin: '0' }}>© {`${new Date().getFullYear()} Ligengxin96@gmail.com`}</h4>
       </div>  
     </div>
   )
