@@ -1,0 +1,24 @@
+name: Build & Deploy CI
+
+on:
+  push:
+    branches: [ demo ]
+  
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+      
+    - name: build
+      run: yarn && yarn run build
+      
+    - uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.DEPLOY_KEY }} # ssh private key
+        publish_dir: ./build
+        publish_branch: demo
+        external_repository: Ligengxin96/sql-in-mongodb
