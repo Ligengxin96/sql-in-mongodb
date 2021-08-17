@@ -22,7 +22,8 @@ const  App = () => {
       setJson(JSON.stringify(mongoQuery, null, 2));
       setError(null);
     } catch (error) {
-      setError(error);
+      setError('Invalid SQL');
+      setJson(error.message);
       console.log(error);
     }
     try {
@@ -30,7 +31,8 @@ const  App = () => {
       setMongoQuery(`db.${table}.find(${JSON.stringify(mongoQuery)})`);
       setError(null);
     } catch (error) {
-      setError(error);
+      setError('Invalid SQL');
+      setMongoQuery(error.message);
       console.log(error);
     }
   }
@@ -69,7 +71,7 @@ const  App = () => {
           </div>
           <h4 style={{ backgroundColor: error ? '#fca4c3' : '#daf6a1', marginBottom: '0' }}>
             <span style={{ color: error ? '#CB0048' : '#557B0A', padding: '8px', fontSize: '1.1rem' }}>
-              {error ? error.message : 'Mongo Query'}
+              {error ? error : 'Mongo Query'}
             </span>
           </h4>
           <div>
@@ -77,11 +79,7 @@ const  App = () => {
               height="36vh"
               defaultLanguage="javascript"
               theme={'vs-dark'}
-              options={{
-                readOnly: true
-              }}
               value={query}
-              onChange={onSourceChange}
             />
           </div>
         </div>
@@ -94,16 +92,13 @@ const  App = () => {
           <div>
             <h4 style={{ backgroundColor: error ? '#fca4c3' : '#daf6a1', marginBottom: '0' }}>
               <span style={{ color: error ? '#CB0048' : '#557B0A', padding: '8px', fontSize: '1.1rem' }}>
-                {error ? error.message : 'Mongo Query Condition'}
+                {error ? error : 'Mongo Query Condition'}
               </span>
             </h4>
             <Editor
               height="77vh"
               defaultLanguage="json"
               theme={'vs-dark'}
-              options={{
-                readOnly: true
-              }}
               value={json}
             />
           </div>
