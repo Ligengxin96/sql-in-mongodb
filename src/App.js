@@ -24,7 +24,8 @@ const  App = () => {
     } catch (error) {
       setError('Invalid SQL');
       setJson(error.message);
-      console.log(error);
+      setMongoQuery(error.message);
+      console.error(error);
     }
     try {
       const table = parser.getSelectedTable(sql);
@@ -32,8 +33,9 @@ const  App = () => {
       setError(null);
     } catch (error) {
       setError('Invalid SQL');
+      setJson(error.message);
       setMongoQuery(error.message);
-      console.log(error);
+      console.error(error);
     }
   }
 
