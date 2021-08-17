@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/sql-in-mongodb/static/js/main.d4141910.chunk.js",
-    "main.js.map": "/sql-in-mongodb/static/js/main.d4141910.chunk.js.map",
+    "main.js": "/sql-in-mongodb/static/js/main.e1f01543.chunk.js",
+    "main.js.map": "/sql-in-mongodb/static/js/main.e1f01543.chunk.js.map",
     "runtime-main.js": "/sql-in-mongodb/static/js/runtime-main.047846bf.js",
     "runtime-main.js.map": "/sql-in-mongodb/static/js/runtime-main.047846bf.js.map",
     "static/js/2.3e327fed.chunk.js": "/sql-in-mongodb/static/js/2.3e327fed.chunk.js",
@@ -12,6 +12,6 @@
   "entrypoints": [
     "static/js/runtime-main.047846bf.js",
     "static/js/2.3e327fed.chunk.js",
-    "static/js/main.d4141910.chunk.js"
+    "static/js/main.e1f01543.chunk.js"
   ]
 }
