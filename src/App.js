@@ -28,8 +28,13 @@ const  App = () => {
       console.error(error);
     }
     try {
+      const columns = parser.getSelectedFeilds(sql);
       const table = parser.getSelectedTable(sql);
-      setMongoQuery(`db.${table}.find(${JSON.stringify(mongoQuery)})`);
+      if (Object.keys(columns).length > 0) {
+        setMongoQuery(`db.${table}.find(${JSON.stringify(mongoQuery)}, ${JSON.stringify(columns)})`);
+      } else {
+        setMongoQuery(`db.${table}.find(${JSON.stringify(mongoQuery)})`);
+      }
       setError(null);
     } catch (error) {
       setError('Invalid SQL');
